@@ -1,0 +1,40 @@
+.loginpage {
+  width: 100vw;   
+  height: 100vh; 
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background: linear-gradient(to right, #007cf0, #00dfd8);
+}
+
+.leftContainer{
+  width: 50%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+}
+
+.rightContainer {
+  width: 50%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image: url('C:\Work\SkillSwap\Frontend\src\assets\Background.jpeg');
+  background-size: cover;         /* Scales image to cover the container */
+  background-position: center;    /* Centers the image */
+  background-repeat: no-repeat;   /* Prevents image tiling */
+}
+
+
+.imageContainer
+{
+  width: 550px;
+  height: 550px;
+  /* background-size: cover;
+  background-position: center; */
+  align-items: center;
+}
