@@ -1,0 +1,24 @@
+/* src/components/SkillExchangeDashboard.module.css */
+.skillExchangeDashboard {
+  display: flex;
+  flex-direction: column; /* Stacks sections vertically */
+  gap: 20px;
+}
+
+.skillCardsRow {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap; /* Allows cards to wrap on smaller screens */
+}
+
+.availabilitySection {
+  /* No specific styles needed here, as the card itself is styled */
+}
+
+/* Responsiveness */
+@media (max-width: 1024px) {
+  .skillCardsRow {
+    flex-direction: column; /* Stack skill cards vertically */
+    align-items: center;
+  }
+}

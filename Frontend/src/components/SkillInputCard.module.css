@@ -1,0 +1,142 @@
+/* src/components/SkillInputCard.module.css */
+.skillInputCard {
+  flex: 1;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 25px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #eee;
+  min-width: 350px;
+  display: flex; /* For internal layout */
+  flex-direction: column;
+}
+
+.skillInputCard h3 {
+  color: #2c3e50;
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+/* Style for each individual skill entry container */
+.skillEntry {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px; /* Space between skill entries */
+  background-color: #ffffff;
+  position: relative; /* For positioning remove button */
+}
+
+.skillEntry h4 {
+  color: #34495e;
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 18px;
+  border-bottom: 1px dashed #f0f0f0;
+  padding-bottom: 10px;
+}
+
+.skillLevelSelectorGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+  margin-top: 15px; /* Add some space above slider */
+}
+
+.skillLevelSlider {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  transition: opacity .2s;
+  border-radius: 5px;
+}
+
+.skillLevelSlider:hover {
+  opacity: 1;
+}
+
+.skillLevelSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #61dafb;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.skillLevelSlider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #61dafb;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.skillLevelValue {
+  font-weight: bold;
+  color: #4a4a4a;
+  margin-top: -5px;
+}
+
+/* New buttons for adding/removing skills */
+.addSkillButton {
+  background-color: #28a745; /* Green for add */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 100%;
+  margin-bottom: 15px; /* Space between add button and submit */
+}
+
+.addSkillButton:hover {
+  background-color: #218838;
+}
+
+.removeSkillButton {
+  background: none;
+  border: none;
+  color: #dc3545; /* Red for remove */
+  font-size: 14px;
+  cursor: pointer;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.removeSkillButton:hover {
+  background-color: rgba(220, 53, 69, 0.1); /* Light red background on hover */
+}
+
+.skillSeparator {
+  border: 0;
+  height: 1px;
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0));
+  margin: 30px 0;
+}
+
+
+/* Responsiveness */
+@media (max-width: 1024px) {
+  .skillInputCard {
+    min-width: unset;
+    width: 95%;
+    max-width: 500px;
+  }
+}

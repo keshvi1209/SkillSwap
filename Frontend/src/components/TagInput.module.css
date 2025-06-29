@@ -1,0 +1,47 @@
+/* src/components/TagInput.module.css */
+.tagInputContainer {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  min-height: 40px;
+}
+
+.tagInputField {
+  flex-grow: 1;
+  border: none;
+  outline: none;
+  padding: 5px 10px;
+  margin: 5px;
+  min-width: 100px;
+}
+
+.tagsDisplay {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 5px;
+}
+
+.tagPill {
+  background-color: #e0f7fa; /* Light cyan */
+  color: #007bb5; /* Darker blue for text */
+  padding: 6px 10px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+}
+
+.removeTagButton {
+  background: none;
+  border: none;
+  color: #007bb5;
+  margin-left: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+}

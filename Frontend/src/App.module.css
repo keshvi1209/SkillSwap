@@ -1,0 +1,99 @@
+.appContainer {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.mainContentArea {
+  flex-grow: 1;
+  background-color: #eff1f6;
+  border-radius: 8px;
+  margin-left: 250px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.headerSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: white;
+  color: grey;
+  margin-bottom:10px;
+  height : 50px;
+  width:100%;
+}
+
+.contentWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+}
+
+/* Common Form Elements & Buttons */
+.formGroup {
+  margin-bottom: 15px;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #555;
+}
+
+.inputField {
+  width: calc(100% - 20px);
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.inputField:focus {
+  border-color: #61dafb;
+  box-shadow: 0 0 0 3px rgba(97, 218, 251, 0.2);
+}
+
+.textareaField {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.primaryButton {
+  background: linear-gradient(to right, #61dafb, #2196F3);
+  color: #ffffff;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 15px;
+  width: 100%;
+}
+
+.primaryButton:hover {
+  background: linear-gradient(to right, #2196F3, #61dafb);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Basic Responsiveness for App Layout */
+@media (max-width: 1024px) {
+  .appContainer {
+    flex-direction: column;
+  }
+
+  .mainContentArea {
+    margin: 15px 10px;
+    padding: 15px;
+  }
+}
