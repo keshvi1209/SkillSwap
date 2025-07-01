@@ -1,8 +1,49 @@
+import { useState } from "react";
 import "./login.css";
 
 function Signup() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const signup_submit = (e) => {
+    e.preventDefault();
+
+    fetch("http://localhost:5000/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name, email, password }), 
+    })
+      .then((res) => {
+        if (res.ok) {
+          alert("Signup Successful");
+          return res.json();
+        } else if (res.status === 401) {
+          alert("Unauthorized: Invalid credentials");
+          throw new Error("Unauthorized");
+        } else if (res.status === 400) {
+          alert("Bad Request: Please fill all fields correctly");
+          throw new Error("Bad Request");
+        } else if (res.status === 404) {
+          alert("Signup route not found (404)");
+          throw new Error("Not Found");
+        } else {
+          alert("Signup failed with status: " + res.status);
+          throw new Error("Signup failed");
+        }
+      })
+      .then((data) => {
+        console.log("Server response:", data);
+      })
+      .catch((error) => {
+        console.error("Error during signup:", error.message);
+      });
+  };
+
   return (
-    <form className="form">
+    <form className="form" onSubmit={signup_submit}>
       <div className="flex-column">
         <p className="heading">Create an account </p>
 
@@ -34,6 +75,8 @@ function Signup() {
             marginBottom: "4px",
             color: "black",
           }}
+          onChange={(e) => setName(e.target.value)}
+          value={name}
         />
       </div>
 
@@ -61,6 +104,8 @@ function Signup() {
             marginBottom: "4px",
             color: "black",
           }}
+          onChange={(e) => setEmail(e.target.value)}
+          value={email}
         />{" "}
       </div>
 
@@ -87,6 +132,8 @@ function Signup() {
             marginBottom: "4px",
             color: "black",
           }}
+          onChange={(e) => setPassword(e.target.value)}
+          value={password}
         />
         <svg
           viewBox="0 0 576 512"
@@ -100,8 +147,8 @@ function Signup() {
 
       <div className="flex-row">
         <div>
-          <input type="checkbox" style={{paddingtop: "5px"}} />
-          <label style={{marginLeft: "3.5px"}}>Remember me </label>
+          <input type="checkbox" style={{ paddingtop: "5px" }} />
+          <label style={{ marginLeft: "3.5px" }}>Remember me </label>
         </div>
       </div>
       <button className="button-submit">Sign up</button>
