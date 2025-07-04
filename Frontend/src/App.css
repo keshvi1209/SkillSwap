@@ -306,6 +306,6 @@ body {
   }
 
   .topbar nav ul {
-    display: none; /* Hide topbar nav on smaller screens, can be replaced with a hamburger menu */
+    display: none; 
   }
 }

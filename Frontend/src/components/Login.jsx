@@ -1,10 +1,14 @@
 import { useState } from "react";
 import "./login.css";
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   const login_submit = (e) => {
     e.preventDefault();
@@ -17,10 +21,7 @@ function Login() {
       body: JSON.stringify({ email, password }),
     })
       .then((res) => {
-        localStorage.setItem('token',res.data.token);
-        navigate('/');
         if (res.status === 200) {
-          alert("Login Successful");
           return res.json();
         } else if (res.status === 401) {
           alert("Unauthorized: Invalid email or password");
@@ -32,6 +33,13 @@ function Login() {
       })
       .then((data) => {
         console.log("Server response:", data);
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+          navigate("/app");
+        } else {
+          alert("Token not found in response");
+          throw new Error("Token missing");
+        }
       })
       .catch((error) => {
         console.error("Error during login:", error);
@@ -85,7 +93,7 @@ function Login() {
           <path d="m304 224c-8.832031 0-16-7.167969-16-16v-80c0-52.929688-43.070312-96-96-96s-96 43.070312-96 96v80c0 8.832031-7.167969 16-16 16s-16-7.167969-16-16v-80c0-70.59375 57.40625-128 128-128s128 57.40625 128 128v80c0 8.832031-7.167969 16-16 16zm0 0"></path>
         </svg>
         <input
-          type="password"
+          type={showPassword ? "text" : "password"}
           className="input"
           placeholder="Enter your Password"
           style={{
@@ -97,7 +105,9 @@ function Login() {
           onChange={(e) => setPassword(e.target.value)}
           value={password}
         />
+
         <svg
+          onClick={() => setShowPassword(!showPassword)} 
           viewBox="0 0 576 512"
           height="1em"
           xmlns="http://www.w3.org/2000/svg"
@@ -159,7 +169,7 @@ function Login() {
       </div>
 
       <p className="p">
-        Don't have an account? <span className="span">Sign Up</span>
+        Don't have an account? <Link to="/signup" className="span" style={{ textDecoration: "none" }}>Sign up</Link>
       </p>
     </form>
   );

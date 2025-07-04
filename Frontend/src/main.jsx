@@ -4,14 +4,17 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Login from './pages/Loginpage.jsx'
 import Signup from './pages/Signuppage.jsx'
 import App from './App.jsx' 
+import Entrypage from './pages/Entrypage.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route element={<Entrypage />}>
+          <Route path="/" element={<App />} />
+        </Route>
         <Route path="/signup" element={<Signup />} />
-        <Route path="*" element={<App />} /> 
+        <Route path="/login" element={<Login />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,
