@@ -1,8 +1,8 @@
 import React from 'react';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
-import SkillExchangeDashboard from './components/SkillExchangeDashboard';
 import styles from './App.module.css';
+import SkillsEntry from './pages/SkillsEntry';
 import './index.css';
 
 function App() {
@@ -15,7 +15,7 @@ function App() {
         </div>
 
         <div className={styles.contentWrapper}>
-          <SkillExchangeDashboard />
+          {<SkillsEntry/>}
         </div>
       </div>
     </div>

@@ -29,8 +29,11 @@
 .contentWrapper {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 20px;
+  gap: 5px;
+  padding-top: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  flex-grow: 1;
 }
 
 /* Common Form Elements & Buttons */
