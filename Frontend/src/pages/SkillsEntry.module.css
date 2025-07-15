@@ -9,6 +9,7 @@
   margin-top: 10px;
   background-color: transparent;
   padding-top: 20px;
+  padding-bottom : 15px;
   border-radius: 20px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
@@ -22,6 +23,16 @@
   background-color: transparent;
   gap: 16px;
 }
+
+.canteachform
+{
+  display: flex;
+  flex-direction: column;
+  background-color: transparent;
+  gap: 16px;
+}
+
+
 
 .buttoncontainer {
   display: flex;
@@ -63,6 +74,12 @@
   display: inline-block;
   text-decoration: none;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.active{
+  background-color: #c99776;
+  color: #333;
+  scale: 1.05;
 }
 
 .rowContainer {
@@ -151,6 +168,7 @@
   text-align: center;
   display: inline-block;
   text-decoration: none;
+  border-radius : 10px;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
