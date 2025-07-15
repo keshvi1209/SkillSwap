@@ -38,14 +38,29 @@
 
 .features {
   display: flex;
-  flex-direction: row;
-  gap: 40px; 
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
 }
 
-.features{
+.featureWrapper {
+  position: relative;
+  cursor: pointer;
+}
+
+.feature {
   font-size: large;
   font-weight: 550;
-  color : #333;
+  color: #333;
+}
+
+.underline {
+  position: absolute;
+  height: 2px;
+  background-color: #333;
+  width: 100%;
+  bottom: -4px;
+  left: 0;
 }
 
 .profile {

@@ -1,6 +1,5 @@
 import React from "react";
 import styles from "./SkillsEntry.module.css";
-import SkillCard from "../components/SkillCard";
 
 function SkillsEntry() {
   function setActive(button) {
@@ -146,9 +145,7 @@ function SkillsEntry() {
           <div className={styles.skillcheckbuttonContainer}>
             <button type="button" className={styles.custombutton}>
               Added skills
-              <span className={styles.badge}>
-                4
-              </span>
+              <span className={styles.badge}>4</span>
             </button>
           </div>
         </div>

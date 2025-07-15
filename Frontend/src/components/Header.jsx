@@ -1,8 +1,19 @@
-import React from "react";
-import styles from "./Header.module.css"; 
-import myimage from "../assets/logo.png"; 
+import {useState} from "react";
+import {motion} from "framer-motion";
+import styles from "./Header.module.css";
+import myimage from "../assets/logo.png";
 
 function Header({ userName, redirectToHome }) {
+  const features = [
+    "Add Skills",
+    "Search Best Fit",
+    "Scheduled Meetings",
+    "Chat",
+    "Past Sessions",
+  ];
+
+  const [active, setActive] = useState("Add Skills");
+
   return (
     <div className={styles.header}>
       <div className={styles.logoContainer}>
@@ -11,11 +22,22 @@ function Header({ userName, redirectToHome }) {
       </div>
       <div className={styles.divider}></div>
       <div className={styles.features}>
-        <span className={styles.feature}>Add Skills</span>
-        <span className={styles.feature}>Search Best Fit</span>
-        <span className={styles.feature}>Scheduled Meetings</span>
-        <span className={styles.feature}>Chat</span>
-        <span className={styles.feature}>Past Sessions</span>
+        {features.map((item) => (
+          <div
+            key={item}
+            className={styles.featureWrapper}
+            onClick={() => setActive(item)}
+          >
+            <span className={styles.feature}>{item}</span>
+            {active === item && (
+              <motion.div
+                layoutId="underline"
+                className={styles.underline}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              />
+            )}
+          </div>
+        ))}
       </div>
       <button className={styles.profile}>Profile</button>
     </div>
