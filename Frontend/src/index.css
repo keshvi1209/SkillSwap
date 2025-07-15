@@ -4,7 +4,7 @@ body {
   font-family: 'Inter', 'Poppins', 'Roboto', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f0f2f5; /* Light background for the whole page */
+  background-color: #f0f2f5; 
   color: #333;
 }
 

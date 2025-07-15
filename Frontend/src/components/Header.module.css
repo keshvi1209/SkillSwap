@@ -1,79 +1,70 @@
 .header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 15px 0;
-  border-bottom: 1px solid #eee;
-  margin:10px 20px;
-  width : 100%;
-  padding-bottom: 10px;
-  padding-top: 10px;
-
-}
-
-.welcomeMessage {
-  font-size: 20px;
-  font-weight: 500;
-  color: #4a4a4a;
-}
-
-.headerRight {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.searchBar {
-  position: relative;
-}
-
-.searchBar input {
-  padding: 8px 15px;
-  border: 1px solid #ddd;
-  border-radius: 20px;
-  outline: none;
-  font-size: 14px;
-  width: 180px;
-  transition: border-color 0.3s ease;
-}
-
-.searchBar input:focus {
-  border-color: #61dafb;
-}
-
-
-.userProfileIcon{
- justify-content: center;
-  align-items: center;
-  display: flex;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: #f0f0f0;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+  justify-content: center;
+  padding: 10px;
   
-}
-.userProfileIcon img {
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  border: 2px solid gray;
-  cursor: pointer; 
+  background-color: white;
+  gap: 15px;
+  width : 100%;
+  border-radius: 8px;
+  box-shadow: 0px 6px 4px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  background: transparent;
 }
 
-/* Responsiveness */
-@media (max-width: 768px) {
-  .header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  .headerRight {
-    width: 100%;
-    justify-content: space-between;
-  }
-  .searchBar input {
-    width: calc(100% - 70px); 
-  }
+.logoContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px; 
 }
+
+.logo {
+  width: 40px;
+  height: auto;
+}
+
+.title {
+  font-size: 32px;
+  color: #333;
+  margin: 0;
+}
+
+.divider {
+  width: 2px;
+  height: 50px;
+  background-color: #333;
+}
+
+.features {
+  display: flex;
+  flex-direction: row;
+  gap: 40px; 
+}
+
+.features{
+  font-size: large;
+  font-weight: 550;
+  color : #333;
+}
+
+.profile {
+  padding: 10px 20px;
+  width : 90px;
+  border: 2px solid #333;
+  border-radius: 25px;
+  color: #333;
+  background-color: #f8ecd6;
+  font-weight: bold;
+  text-align: center;
+  display: inline-block;
+  text-decoration: none;
+  transition: background-color 0.3s ease, color 0.3s ease;}
+
+.profile:hover {
+  color: black;
+  background-color: #c99776;
+  cursor: pointer;
+}
+
+

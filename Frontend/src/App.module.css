@@ -1,102 +1,37 @@
-.appContainer {
-  display: flex;
-  min-height: 100vh;
-  width: 100%;
-}
 
-.mainContentArea {
-  flex-grow: 1;
-  background-color: #eff1f6;
-  border-radius: 8px;
-  margin-left: 250px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+.intro {
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
-}
-
-.headerSection {
-  display: flex;
   align-items: center;
-  justify-content: space-between;
-  background-color: white;
-  color: grey;
-  margin-bottom:10px;
-  height : 50px;
-  width:100%;
+  min-height: 100vh;
+  background-image: url("./assets/IntroBackground.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
 }
 
-.contentWrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  padding-top: 5px;
-  padding-left: 10px;
-  padding-right: 10px;
-  flex-grow: 1;
-}
 
-/* Common Form Elements & Buttons */
-.formGroup {
-  margin-bottom: 15px;
-}
-
-.formGroup label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #555;
-}
-
-.inputField {
-  width: calc(100% - 20px);
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 15px;
-  outline: none;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.inputField:focus {
-  border-color: #61dafb;
-  box-shadow: 0 0 0 3px rgba(97, 218, 251, 0.2);
-}
-
-.textareaField {
-  resize: vertical;
-  min-height: 80px;
-}
-
-.primaryButton {
-  background: linear-gradient(to right, #61dafb, #2196F3);
-  color: #ffffff;
-  border: none;
-  padding: 12px 25px;
-  border-radius: 8px;
-  font-size: 16px;
+.heading {
+  font-size: 34px;
+  margin-top: 95px;
+  margin-bottom: 0px;
   font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  margin-top: 15px;
-  width: 100%;
+  text-align: center;
+  background: linear-gradient(to right, #f4e2c1, #e3803e); /* light peach shades */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-.primaryButton:hover {
-  background: linear-gradient(to right, #2196F3, #61dafb);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  transform: translateY(-2px);
+
+.subheading
+{
+  color: #333;
+  font-size: 24px;
+  font-weight: 400;
+  text-align : center;
+  margin: 5px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-/* Basic Responsiveness for App Layout */
-@media (max-width: 1024px) {
-  .appContainer {
-    flex-direction: column;
-  }
-
-  .mainContentArea {
-    margin: 15px 10px;
-    padding: 15px;
-  }
-}
