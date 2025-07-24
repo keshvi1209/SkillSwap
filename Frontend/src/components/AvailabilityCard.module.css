@@ -1,0 +1,91 @@
+.card {
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
+  background-color: #fff;
+  border-radius: 16px;
+  font-family: Arial, sans-serif;
+}
+
+.heading {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.buttonGroup {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.toggleButton {
+  padding: 10px 20px;
+  border-radius: 25px;
+  border: 1px solid #ccc;
+  background-color: #f8ecd6;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.toggleButton:hover {
+  background-color: #c99776;
+}
+
+.active {
+  background-color: #c99776;
+  color: black;
+  border-color: #c99776;
+}
+
+.timeInputs {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 90%;
+  font-size: 14px;
+}
+
+.manualContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dayRow {
+  display: flex;
+  flex-direction: column;
+}
+
+
+.timePair {
+  display: flex;
+  gap: 12px;
+  margin-top:1px;
+}
+
+
+.submitButton {
+  margin-top: 24px;
+  padding: 10px 20px;
+  width: 100%;
+  background-color: #c99776;
+  color: black;
+  font-size: 16px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submitButton:hover {
+  background-color: #ac6230;
+}

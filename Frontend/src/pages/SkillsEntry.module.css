@@ -240,14 +240,17 @@
 }
 
 .custombutton {
-  position: relative;
-  background-color: #c99776; 
+  align-items: center;
+  border: 2px solid #333;
+  height:40px;
   color: #333;
-  border: none;
-  padding: 10px 20px;
-  font-size: 16px;
-  border-radius: 6px;
-  cursor: pointer;
+  background-color: #c99776;
+  font-weight: bold;
+  text-align: center;
+  display: inline-block;
+  text-decoration: none;
+  border-radius : 10px;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .custombutton:hover{
@@ -261,7 +264,7 @@
   top: 0;
   left: 100%;
   transform: translate(-50%, -50%);
-  background-color: #dc3545; /* Bootstrap danger */
+  background-color: #dc3545;
   color: white;
   border-radius: 999px;
   padding: 4px 8px;
@@ -269,3 +272,35 @@
   font-weight: bold;
 }
 
+.popupOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.3); 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.popupCard {
+  background-color: white;
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+  width: 400px;
+  padding-bottom: 20px;
+  position: relative;
+}
+
+.closeButton {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font-size: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}

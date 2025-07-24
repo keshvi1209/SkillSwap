@@ -24,9 +24,9 @@
   justify-content: center;
   align-items: center;
   background-image: url('C:\Work\SkillSwap\Frontend\src\assets\Background.jpeg');
-  background-size: cover;         /* Scales image to cover the container */
-  background-position: center;    /* Centers the image */
-  background-repeat: no-repeat;   /* Prevents image tiling */
+  background-size: cover;        
+  background-position: center;    
+  background-repeat: no-repeat;   
 }
 
 
@@ -34,7 +34,5 @@
 {
   width: 550px;
   height: 550px;
-  /* background-size: cover;
-  background-position: center; */
   align-items: center;
 }

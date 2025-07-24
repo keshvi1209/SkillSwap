@@ -14,7 +14,7 @@ function App() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.05, // delay between letters
+        staggerChildren: 0.05, 
       },
     },
   };

@@ -94,19 +94,9 @@ function Tolearn() {
           <div className={styles.skillcheckbuttonContainer}>
             <button type="button" className={styles.custombutton}>
               Added skills
-              {/* <span className={styles.badge}>4</span> */}
             </button>
           </div>
         </div>
-
-        {/* {showAvailabilityPopup && (
-              <div style={{ textAlign: "center", marginTop: "10px" }}>
-                <p>[Availability Modal Placeholder]</p>
-                <button >
-                  Close
-                </button>
-              </div>
-            )} */}
       
     </form>
   )

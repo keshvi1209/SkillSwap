@@ -1,6 +1,6 @@
 import React from "react";
 import Login from "../components/Login";
-import myimage from "../assets/logo.svg"; // Importing the image
+import myimage from "../assets/logo.svg"; 
 import style from './Loginpage.module.css';
 
 function Loginpage() {
