@@ -11,7 +11,7 @@ const days = [
   "Sunday",
 ];
 
-export default function AvailabilityCard({ closeCard }) {
+export default function AvailabilityCard({ closeCard, saveAvailability }) {
   const [mode, setMode] = useState("daily");
   const [dailyTime, setDailyTime] = useState({ start: "", end: "" });
   const [manualTime, setManualTime] = useState(
@@ -36,6 +36,24 @@ export default function AvailabilityCard({ closeCard }) {
     });
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const availabilityData =
+      mode === "daily"
+        ? { mode, time: dailyTime }
+        : { mode, time: manualTime };
+
+    console.log("Availability submitted:", availabilityData);
+
+    if (saveAvailability) {
+      saveAvailability(availabilityData);
+    }
+
+    closeCard();
+  };
+
   return (
     <div className={styles.card}>
       <h2 className={styles.heading}>Set Your Availability</h2>
@@ -43,9 +61,7 @@ export default function AvailabilityCard({ closeCard }) {
       <div className={styles.buttonGroup}>
         <button
           type="button"
-          className={`${styles.toggleButton} ${
-            mode === "daily" ? styles.active : ""
-          }`}
+          className={`${styles.toggleButton} ${mode === "daily" ? styles.active : ""}`}
           onClick={(e) => {
             e.stopPropagation();
             setMode("daily");
@@ -56,9 +72,7 @@ export default function AvailabilityCard({ closeCard }) {
 
         <button
           type="button"
-          className={`${styles.toggleButton} ${
-            mode === "manual" ? styles.active : ""
-          }`}
+          className={`${styles.toggleButton} ${mode === "manual" ? styles.active : ""}`}
           onClick={(e) => {
             e.stopPropagation();
             setMode("manual");
@@ -119,19 +133,9 @@ export default function AvailabilityCard({ closeCard }) {
         </div>
       )}
 
-      <button
-        type="button"
-        className={styles.submitButton}
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          console.log("Availability submitted");
-          closeCard();
-        }}
-      >
+      <button type="button" className={styles.submitButton} onClick={handleSubmit}>
         Submit
       </button>
-
     </div>
   );
 }

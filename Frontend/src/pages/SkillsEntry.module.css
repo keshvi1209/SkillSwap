@@ -304,3 +304,9 @@
   border: none;
   cursor: pointer;
 }
+
+.required {
+  color: red;
+  margin-left: 4px;
+}
+
