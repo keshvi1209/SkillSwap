@@ -46,23 +46,54 @@ function Tolearn() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("Form Submitted: ", formData);
+    const payload = {
+      skill: formData.skill,
+      proficiency: formData.proficiency,
+      mode: formData.mode,
+      languages: formData.languages,
+      tags: formData.tags,
+    };
 
-    setShowAlert(true);
+    try {
+      const response = await fetch("http://localhost:5000/tolearnskills", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", 
+        },
+        body: JSON.stringify(payload), 
+      });
 
-    setTimeout(() => {
-      setShowAlert(false);
-    }, 1000);
+      const result = await response.json();
+      console.log("Upload success:", result);
+
+      setShowAlert(true);
+      setTimeout(() => {
+        setShowAlert(false);
+        setFormData({
+          skill: "",
+          proficiency: "",
+          mode: "",
+          languages: [],
+          tags: [],
+        });
+        setRawLanguages("");
+        setRawTags("");
+      }, 1000);
+    } catch (error) {
+      console.error("Upload error:", error);
+    }
   };
 
   return (
     <form className={styles.canteachform} onSubmit={handleSubmit}>
       <div className={styles.rowContainer}>
         <div className={styles.selectContainer}>
-          <label className={styles.inputhead}>Skill<span className={styles.required}>*</span></label>
+          <label className={styles.inputhead}>
+            Skill<span className={styles.required}>*</span>
+          </label>
           <input
             type="text"
             className={styles.input}
@@ -77,7 +108,9 @@ function Tolearn() {
 
       <div className={styles.rowContainer}>
         <div className={styles.selectContainer}>
-          <label className={styles.inputhead}>Current Proficiency Level<span className={styles.required}>*</span></label>
+          <label className={styles.inputhead}>
+            Current Proficiency Level<span className={styles.required}>*</span>
+          </label>
           <select
             className={styles.select}
             name="proficiency"
@@ -95,7 +128,9 @@ function Tolearn() {
 
       <div className={styles.rowContainer}>
         <div className={styles.modeselectContainer}>
-          <label className={styles.inputhead}>Preferred Mode of Learning<span className={styles.required}>*</span></label>
+          <label className={styles.inputhead}>
+            Preferred Mode of Learning<span className={styles.required}>*</span>
+          </label>
           <select
             className={styles.select}
             name="mode"
@@ -111,7 +146,9 @@ function Tolearn() {
         </div>
 
         <div className={styles.languageselectContainer}>
-          <label className={styles.inputhead}>Preferred Language(s)<span className={styles.required}>*</span></label>
+          <label className={styles.inputhead}>
+            Preferred Language(s)<span className={styles.required}>*</span>
+          </label>
           <input
             type="text"
             className={styles.input}
@@ -126,7 +163,9 @@ function Tolearn() {
 
       <div className={styles.rowContainer}>
         <div className={styles.yearelectContainer}>
-          <label className={styles.inputhead}>Tags<span className={styles.required}>*</span></label>
+          <label className={styles.inputhead}>
+            Tags<span className={styles.required}>*</span>
+          </label>
           <input
             type="text"
             className={styles.input}

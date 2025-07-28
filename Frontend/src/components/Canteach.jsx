@@ -103,8 +103,6 @@ function Canteach() {
       const result = await response.json();
       console.log("Upload success:", result);
 
-      setShowAlert(true);
-      setTimeout(() => setShowAlert(false), 1000);
 
       setShowAlert(true);
       setTimeout(() => {
