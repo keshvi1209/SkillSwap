@@ -10,6 +10,10 @@ import ProfilePage from "./pages/ProfilePage.jsx";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { jwtDecode } from "jwt-decode";
 import EditCanteach from "./components/Editcanteachskill.jsx";
+import TeachSkillsPage from "./pages/TeachSkillsPage.jsx";
+import LearnSkillsPage from "./pages/LearnSkillsPage.jsx";
+import Preference from "./pages/PreferencePage.jsx";
+import HomePage from "./pages/HomePage.jsx";
 
 function AuthInitializer({ children }) {
   const { setUser } = useAuth();
@@ -42,12 +46,16 @@ createRoot(document.getElementById("root")).render(
         <BrowserRouter>
           <Routes>
             <Route element={<Entrypage />}>
-              <Route path="/" element={<App />} />
+              <Route path="/" element={<Preference />} />
             </Route>
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/editcanteach" element={<EditCanteach />} />
+            <Route path="/teach" element={<TeachSkillsPage />} />
+            <Route path="/learn" element={<LearnSkillsPage />} />
+            <Route path="/app" element={<App />} />
+            <Route path="/homepage" element={<HomePage />} />
           </Routes>
         </BrowserRouter>
       </AuthInitializer>
