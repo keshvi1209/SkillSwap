@@ -1,23 +1,19 @@
 import ToLearn from "../model/tolearnskillsModel.js";
+import User from "../model/user.js";
 
 export const tolearnskills = async (req, res) => {
   try {
-    const {
-      skill,
-      proficiency,
-      mode,
-      languages,
-      tags,
-    } = req.body;
-
+    const { skill, proficiency, mode, languages, tags } = req.body;
 
     const newEntry = await ToLearn.create({
       skill,
       proficiency,
       mode,
-      languages: Array.isArray(req.body.languages) ? req.body.languages : [req.body.languages],
-      tags: Array.isArray(req.body.tags) ? req.body.tags : [req.body.tags],
+      languages: Array.isArray(languages) ? languages : [languages],
+      tags: Array.isArray(tags) ? tags : [tags],
     });
+
+    await User.findByIdAndUpdate(req.user.id, { $push: { toLearn: newEntry._id } });
 
     res.status(201).json({ message: "Skill added successfully!", data: newEntry });
   } catch (error) {

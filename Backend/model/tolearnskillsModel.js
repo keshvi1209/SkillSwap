@@ -11,6 +11,9 @@ const tolearnSchema = new mongoose.Schema(
     mode: { type: String, enum: ["online", "offline", "both"], required: true },
     languages: { type: [String], required: true }, 
     tags: { type: [String], required: true },
+  },
+  {
+  timestamps: true,
   }
 );
 

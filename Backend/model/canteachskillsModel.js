@@ -1,4 +1,3 @@
-
 import mongoose from "mongoose";
 
 const canteachSchema = new mongoose.Schema(
@@ -16,6 +15,9 @@ const canteachSchema = new mongoose.Schema(
     tags: { type: [String], required: true },
     availability: { type: Object, required: true },
     certificates: [String], 
+  },
+  {
+  timestamps: true,
   }
 );
 

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const user = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -14,9 +14,15 @@ const user = new mongoose.Schema({
     type: String,
     required: true,
   },
-  },
-)
+  canTeach: [
+    { type: mongoose.Schema.Types.ObjectId, ref: "Canteach" }
+  ],
+  toLearn: [
+    { type: mongoose.Schema.Types.ObjectId, ref: "ToLearn" }
+  ]
+,},{
+  timestamps: true,
+});
 
-const User = mongoose.model("User", user);
-
+const User = mongoose.model("User", userSchema);
 export default User;
