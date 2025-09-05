@@ -1,16 +1,13 @@
-import {useState} from "react";
-import {motion} from "framer-motion";
+import { useState } from "react";
+import { motion } from "framer-motion";
 import styles from "./Header.module.css";
 import myimage from "../assets/logo.png";
+import { useNavigate } from "react-router-dom";
 
 function Header({ userName, redirectToHome }) {
-  const features = [
-    "Add Skills",
-    "Search Best Fit",
-    "Scheduled Meetings",
-    "Chat",
-    "Past Sessions",
-  ];
+  const navigate = useNavigate();
+
+  const features =["Add Skills", "Search Best Fit", "Scheduled Meetings", "Chat", "Past Sessions"]
 
   const [active, setActive] = useState("Add Skills");
 
@@ -28,7 +25,7 @@ function Header({ userName, redirectToHome }) {
             className={styles.featureWrapper}
             onClick={() => setActive(item)}
           >
-            <span className={styles.feature}>{item}</span>
+           <span className={styles.feature}>{item}</span>
             {active === item && (
               <motion.div
                 layoutId="underline"
@@ -39,7 +36,7 @@ function Header({ userName, redirectToHome }) {
           </div>
         ))}
       </div>
-      <button className={styles.profile}>Profile</button>
+      <button className={styles.profile} onClick={() => navigate("/profile")}>Profile</button>
     </div>
   );
 }

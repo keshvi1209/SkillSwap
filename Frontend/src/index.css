@@ -1,18 +1,20 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
+@import "tailwindcss";
 
 body {
   margin: 0;
+  
   font-family: 'Inter', 'Poppins', 'Roboto', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f0f2f5; 
+  background-color: white; 
   color: #333;
+
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+html, body {
+  overflow-x: hidden;
 }

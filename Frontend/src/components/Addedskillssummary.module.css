@@ -1,0 +1,11 @@
+.addedSkillsContainer
+{
+  background-color: #faf0d6;
+  margin-top : -15px;
+  width: 52.5%;
+  min-height: 150px;  
+  max-height: 900px;
+  border: 2px solid rgba(0, 0, 0, 0.1); 
+  border-radius: 2px; 
+}
+

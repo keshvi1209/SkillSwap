@@ -1,0 +1,55 @@
+.skillsSummaryContainer
+{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-radius: 12px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  box-shadow: 0px 10px 30px rgba(11, 11, 11, 0.1);
+  gap: 40px;
+  height : 60px;
+  position: relative;
+}
+
+.maincontainer
+{
+  display: flex;
+  flex-direction: column;
+  gap : 10px;
+}
+
+.value
+{
+  font-size: 20px;
+  font-weight: 500;
+  margin-left : 30px;
+  margin-top : 20px; 
+  color: #3d3d3d;
+}
+
+.dropdownButton
+{
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  margin-top : 24px;
+  margin-right : 40px;
+}
+
+.arrow
+{
+    width : 40px;
+  height : 40px;
+
+}
+
+
+.dropdownContent {
+  /* margin-top: 10px;
+  padding: 10px; */
+  border: 1px solid #ddd;
+  background: #f9f9f9;
+  border-radius: 8px;
+}

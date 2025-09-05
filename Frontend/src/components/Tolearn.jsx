@@ -56,12 +56,14 @@ function Tolearn() {
       languages: formData.languages,
       tags: formData.tags,
     };
-
+    
+    const token = localStorage.getItem("token");
     try {
       const response = await fetch("http://localhost:5000/tolearnskills", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json", 
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload), 
       });

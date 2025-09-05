@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./login.css";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-
+import { jwtDecode } from "jwt-decode";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -35,7 +35,13 @@ function Login() {
         console.log("Server response:", data);
         if (data.token) {
           localStorage.setItem("token", data.token);
-          navigate("/app");
+          const decoded = jwtDecode(data.token);
+          localStorage.setItem("userid", decoded.id); // Refresh token in localStorage
+          localStorage.setItem("name", decoded.name);
+          localStorage.setItem("email", decoded.email);
+          console.log("Decoded JWT:", decoded);
+
+          navigate("/");
         } else {
           alert("Token not found in response");
           throw new Error("Token missing");

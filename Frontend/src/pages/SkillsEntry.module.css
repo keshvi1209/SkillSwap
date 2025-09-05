@@ -45,7 +45,7 @@
   align-items: center;
   width: 120px;
   height : 40px;
-  border: 2px solid #333;
+  border: 1px solid #333;
   border-top-right-radius: 0px;
   border-bottom-right-radius: 0px;
   border-top-left-radius: 10px;
@@ -62,7 +62,7 @@
 .cardselect2 {
   align-items: center;
   width: 120px;
-  border: 2px solid #333;
+  border: 1px solid #333;
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
   border-top-left-radius: 0px;
@@ -160,7 +160,7 @@
 
 .submitbutton {
   align-items: center;
-  border: 2px solid #333;
+  border: 1px solid #333;
   height:40px;
   color: #333;
   background-color: #c99776;
@@ -168,7 +168,7 @@
   text-align: center;
   display: inline-block;
   text-decoration: none;
-  border-radius : 10px;
+  border-radius: 5px;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -241,7 +241,7 @@
 
 .custombutton {
   align-items: center;
-  border: 2px solid #333;
+  border: 1px solid #333;
   height:40px;
   color: #333;
   background-color: #c99776;
@@ -249,7 +249,7 @@
   text-align: center;
   display: inline-block;
   text-decoration: none;
-  border-radius : 10px;
+  border-radius: 5px;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -309,4 +309,3 @@
   color: red;
   margin-left: 4px;
 }
-

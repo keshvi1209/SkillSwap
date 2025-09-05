@@ -8,7 +8,7 @@
   border-radius: 8px;
   box-shadow: 0px 6px 4px rgba(0, 0, 0, 0.1);
   position: fixed;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.322);
   backdrop-filter: blur(10px);
   z-index: 800;
 }
@@ -52,6 +52,13 @@
   font-size: large;
   font-weight: 550;
   color: #333;
+}
+
+.activeFeature
+{
+  font-size: large;
+  font-weight: 550;
+  color: #76c9b4;
 }
 
 .underline {

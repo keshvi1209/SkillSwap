@@ -94,15 +94,18 @@ function Canteach() {
       data.append("certificates", file);
     });
 
+    const token = localStorage.getItem("token");
     try {
       const response = await fetch("http://localhost:5000/canteachskills", {
         method: "POST",
         body: data,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       const result = await response.json();
       console.log("Upload success:", result);
-
 
       setShowAlert(true);
       setTimeout(() => {

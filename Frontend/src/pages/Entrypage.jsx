@@ -7,4 +7,4 @@ function Entrypage() {
    return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
 }
 
-export default Entrypage
+export default Entrypage 
