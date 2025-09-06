@@ -6,6 +6,7 @@ import multer from "multer";
 import authMiddleware from "../middleware/authMiddleware.js";
 import { getCanTeachSkills,getToLearnSkills } from "../control/getSkillsController.js";
 import { getcanteachbyid, putcanteachbyid } from "../control/editSkillsController.js";
+import { setCanTeachPreferences, setToLearnPreferences } from "../control/SetPreferencesController.js";
 
 const router = Router();
 
@@ -26,5 +27,7 @@ router.get("/getcanteachskills", getCanTeachSkills);
 router.get("/gettolearnskills", getToLearnSkills);
 router.get("/editcanteachskills/:id", getcanteachbyid);
 router.put("/savecanteachskills/:id", putcanteachbyid);
+router.patch("/canteachpreferences/:id", setCanTeachPreferences);
+router.patch("/tolearnpreferences/:id", setToLearnPreferences);
 
 export default router;

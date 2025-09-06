@@ -1,19 +1,20 @@
 import { StrictMode, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+import "./index.css";
+import EditCanteach from "./components/Editcanteachskill.jsx";
 import Login from "./pages/Loginpage.jsx";
 import Signup from "./pages/Signuppage.jsx";
-import App from "./App.jsx";
-import "./index.css";
 import Entrypage from "./pages/Entrypage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
-import { AuthProvider, useAuth } from "./context/AuthContext";
-import { jwtDecode } from "jwt-decode";
-import EditCanteach from "./components/Editcanteachskill.jsx";
 import TeachSkillsPage from "./pages/TeachSkillsPage.jsx";
 import LearnSkillsPage from "./pages/LearnSkillsPage.jsx";
 import Preference from "./pages/PreferencePage.jsx";
 import HomePage from "./pages/HomePage.jsx";
+import App from "./App.jsx";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+
 
 function AuthInitializer({ children }) {
   const { setUser } = useAuth();
