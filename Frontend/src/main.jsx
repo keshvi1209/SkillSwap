@@ -14,7 +14,7 @@ import Preference from "./pages/PreferencePage.jsx";
 import HomePage from "./pages/HomePage.jsx";
 import App from "./App.jsx";
 import { AuthProvider, useAuth } from "./context/AuthContext";
-
+import UserDetail from "./pages/UserDetail.jsx";
 
 function AuthInitializer({ children }) {
   const { setUser } = useAuth();
@@ -57,6 +57,7 @@ createRoot(document.getElementById("root")).render(
             <Route path="/learn" element={<LearnSkillsPage />} />
             <Route path="/app" element={<App />} />
             <Route path="/homepage" element={<HomePage />} />
+            <Route path="/userdetail" element={<UserDetail />} />
           </Routes>
         </BrowserRouter>
       </AuthInitializer>

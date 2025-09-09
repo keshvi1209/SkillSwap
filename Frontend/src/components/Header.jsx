@@ -17,7 +17,7 @@ function Header({ userName, redirectToHome }) {
         <img src={myimage} alt="Logo" className={styles.logo} />
         <h1 className={styles.title}>SkillSwap</h1>
       </div>
-      <div className={styles.divider}></div>
+      {/* <div className={styles.divider}></div> */}
       <div className={styles.features}>
         {features.map((item) => (
           <div

@@ -1,9 +1,9 @@
 .header {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-evenly;
   padding: 10px;
-  gap: 15px;
+  /* gap: 15px; */
   width: 100%;
   border-radius: 8px;
   box-shadow: 0px 6px 4px rgba(0, 0, 0, 0.1);
@@ -17,6 +17,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-left: 40px;
 }
 
 .logo {
@@ -41,6 +42,8 @@
   gap: 20px;
   justify-content: center;
   align-items: center;
+  margin-right: 20px;
+  
 }
 
 .featureWrapper {
@@ -72,20 +75,21 @@
 
 .profile {
   padding: 10px 20px;
-  width: 90px;
-  border: 2px solid #333;
-  border-radius: 25px;
+  width: 100px;
+  border: 1px solid #333;
+  border-radius: 7px;
   color: #333;
-  background-color: #f8ecd6;
+  background-color:#c99776 ;
   font-weight: bold;
   text-align: center;
   display: inline-block;
   text-decoration: none;
   transition: background-color 0.3s ease, color 0.3s ease;
+  margin-right: 40px;
 }
 
 .profile:hover {
   color: black;
-  background-color: #c99776;
+  background-color: #f8ecd6;
   cursor: pointer;
 }
