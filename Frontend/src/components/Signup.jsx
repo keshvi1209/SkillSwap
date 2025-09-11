@@ -39,7 +39,7 @@ function Signup() {
       })
       .then((data) => {
         console.log("Server response:", data);
-        navigate("/");
+        navigate("/login");
       })
       .catch((error) => {
         console.error("Error during signup:", error.message);

@@ -27,6 +27,10 @@ const userSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+    contact: { type: String, default: "" },
+    address: { type: String, default: "" },
+    city: { type: String, default: "" },
+    state: { type: String, default: "" },
   },
   {
     timestamps: true,
