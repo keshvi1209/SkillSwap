@@ -18,8 +18,7 @@ export const getupdateddetails = async (req, res) => {
 // POST endpoint to update user details - matches frontend POST request
 export const updatedetails = async (req, res) => {
   try {
-    const { contact, address, city, state } = req.body;
-    const userId = req.user.id; // Make sure your auth middleware sets req.user
+    const { userId,contact, address, city, state } = req.body;
    
     let userDetails = await User.findOne({ _id: userId });
     if (!userDetails) {
