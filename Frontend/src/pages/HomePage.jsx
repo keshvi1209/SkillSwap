@@ -1,68 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import Header from "../components/Header";
 
-const Header = () => (
-  <header className="w-full bg-gradient-to-r from-gray-900 to-gray-800 shadow-lg animate-fade-in">
-    <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-      <div className="flex items-center">
-        <div className="bg-gray-700 p-2 rounded-lg mr-3 shadow-md animate-pulse">
-          <svg
-            className="w-8 h-8 text-blue-400"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-          >
-            <path d="M12 14l9-5-9-5-9 5 9 5z" />
-            <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"
-            />
-          </svg>
-        </div>
-        <h1 className="text-2xl font-bold text-white tracking-wide">
-          Skill Match
-        </h1>
-      </div>
-      <nav className="hidden md:flex space-x-6">
-        <a
-          href="#"
-          className="text-gray-300 hover:text-blue-400 transition-colors duration-300"
-        >
-          Home
-        </a>
-        <a
-          href="#"
-          className="text-gray-300 hover:text-blue-400 transition-colors duration-300"
-        >
-          Explore
-        </a>
-        <a
-          href="#"
-          className="text-gray-300 hover:text-blue-400 transition-colors duration-300"
-        >
-          Community
-        </a>
-        <a
-          href="#"
-          className="text-gray-300 hover:text-blue-400 transition-colors duration-300"
-        >
-          About
-        </a>
-      </nav>
-      <button className="bg-blue-500 text-white px-4 py-2 rounded-full font-semibold hover:bg-blue-600 transition-all duration-300 transform hover:scale-105">
-        Sign In
-      </button>
-    </div>
-  </header>
-);
-
-const Card = ({ children, className = "", onClick }) => (
+const Card = ({ children, className = "", onClick, style }) => (
   <div
     className={`bg-gray-800 rounded-xl border border-gray-700 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 overflow-hidden ${className}`}
     onClick={onClick}
+    style={style}
   >
     {children}
   </div>
@@ -173,6 +118,7 @@ export default function HomePage() {
         }
 
         const recData = await recRes.json();
+        console.log("Fetched recommendations:", recData);
         const ids = recData.recommendations;
 
         if (!ids || ids.length === 0) {
@@ -181,19 +127,21 @@ export default function HomePage() {
         }
 
         const detailsPromises = ids.map(async (id) => {
-          const res = await fetch(`http://localhost:5000/getdetails/${id}`, {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          if (!res.ok) {
-            throw new Error(`Failed to fetch details for user ${id}`);
+          try {
+            const res = await fetch(`http://localhost:5000/getdetails/${id}`, {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            return res.ok ? res.json() : null;
+          } catch (err) {
+            console.error(`Failed to fetch details for user ${id}`, err);
+            return null;
           }
-          return res.json();
         });
 
-        const users = await Promise.all(detailsPromises);
+        const users = (await Promise.all(detailsPromises)).filter(Boolean);
         console.log("Fetched user details:", users);
         setRecommendations(users);
       } catch (err) {
@@ -209,7 +157,7 @@ export default function HomePage() {
     } else {
       setLoading(false);
     }
-  }, [currentUserId]);
+  }, [currentUserId, token]);
 
   const filteredData = recommendations.filter(
     (item) =>
@@ -266,11 +214,11 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {filteredData.map((item, index) => (
               <Card
-                key={item._id}
+                key={item.userId || item._id}
                 className="cursor-pointer animate-fade-in-up"
                 style={{ animationDelay: `${index * 0.1}s` }}
                 onClick={() =>
-                  navigate("/userdetail", { state: { user: item } })
+                  navigate("/userdetail", { state: { user: item.userId || item._id } })
                 }
               >
                 <div className="relative">
@@ -285,8 +233,11 @@ export default function HomePage() {
                   <h2 className="text-xl font-bold text-white mb-2">
                     {item.name || "Unknown User"}
                   </h2>
-                  <p className="text-sm text-gray-400 mb-4">
-                    {item.email || ""}
+              
+                  <p className="text-sm text-gray-500 mb-4">
+                    {item.city && item.state
+                      ? `${item.city}, ${item.state}`
+                      : item.city || item.state || "Location not provided"}
                   </p>
 
                   <div className="mb-4">
@@ -332,6 +283,13 @@ export default function HomePage() {
                       )}
                     </div>
                   </div>
+
+                  {/* Show star rating if available */}
+                  {item.rating !== undefined && (
+                    <div className="mb-4">
+                      <StarRating rating={item.rating} />
+                    </div>
+                  )}
 
                   <Button className="mt-2">Connect</Button>
                 </CardContent>

@@ -8,7 +8,7 @@ import { getCanTeachSkills,getToLearnSkills } from "../control/getSkillsControll
 import { getcanteachbyid, putcanteachbyid } from "../control/editSkillsController.js";
 import { setCanTeachPreferences, setToLearnPreferences } from "../control/SetPreferencesController.js";
 import recommendations from "../control/recommendationController.js";
-import getDetails from "../control/getDetailsController.js";
+import {getDetails,getusercompletedetails} from "../control/getDetailsController.js";
 import { getupdateddetails,updatedetails } from "../control/basicDetailsController.js";
 
 const router = Router();
@@ -38,5 +38,6 @@ router.get("/recommendations/:id", recommendations);
 router.get("/getdetails/:id", getDetails);
 router.get("/getupdateddetails/:id", getupdateddetails);
 router.put("/updatedetails", updatedetails);
+router.get("/getusercompletedetails/:id", getusercompletedetails);
 
 export default router;
