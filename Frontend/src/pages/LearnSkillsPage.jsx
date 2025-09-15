@@ -32,6 +32,8 @@ const LearnSkillsPage = ({ setUserData }) => {
     );
   };
 
+  // In your LearnSkillsPage handleNext function, replace the localStorage line:
+
   const handleNext = async () => {
     if (selected.length === 0) {
       alert("Please select at least one skill you want to learn!");
@@ -68,13 +70,15 @@ const LearnSkillsPage = ({ setUserData }) => {
         throw new Error(msg);
       }
 
+      // FIXED: Store the user object properly
+      localStorage.setItem("toLearnPreferences", JSON.stringify(data.toLearnPreferences));
+
       navigate("/teach");
     } catch (error) {
       console.error("Error saving toLearn skills:", error.message);
       alert("Failed to save skills. Try again!");
     }
   };
-
   return (
     <div style={styles.wrapper}>
       {/* Animated background elements */}
@@ -146,7 +150,7 @@ const LearnSkillsPage = ({ setUserData }) => {
             disabled={selected.length === 0}
             className="skill-select-button"
           >
-            Continue 
+            Continue
             <span style={styles.arrow}>→</span>
           </button>
         </div>
@@ -401,31 +405,31 @@ const styles = {
     fontWeight: "400",
     margin: "0",
   },
-grid: {
-  display: "flex",
-  flexDirection: "row",
-  flexWrap: "wrap",
-  gap: "15px",
-  justifyContent: "center",
-},
+  grid: {
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: "15px",
+    justifyContent: "center",
+  },
 
-card: {
-  padding: "8px 16px",       
-  borderRadius: "15px",      
-  cursor: "pointer",
-  fontWeight: "600",
-  fontSize: "15px",
-  userSelect: "none",
-  transition: "all 0.2s ease",
-  display: "inline-flex",    
-  justifyContent: "center",
-  alignItems: "center",
-  width: "fit-content",      
-  minWidth: "100px",         // ⬅️ ensures a minimum size
-  height: "48px",            // consistent height
-  whiteSpace: "nowrap",      
-  border: "1px solid #ccc",
-},
+  card: {
+    padding: "8px 16px",
+    borderRadius: "15px",
+    cursor: "pointer",
+    fontWeight: "600",
+    fontSize: "15px",
+    userSelect: "none",
+    transition: "all 0.2s ease",
+    display: "inline-flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "fit-content",
+    minWidth: "100px", // ⬅️ ensures a minimum size
+    height: "48px", // consistent height
+    whiteSpace: "nowrap",
+    border: "1px solid #ccc",
+  },
   checkmark: {
     position: "absolute",
     top: "5px",

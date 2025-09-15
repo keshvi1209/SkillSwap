@@ -47,8 +47,9 @@ createRoot(document.getElementById("root")).render(
         <BrowserRouter>
           <Routes>
             <Route element={<Entrypage />}>
-              <Route path="/" element={<Preference />} />
+              <Route path="/" element={<HomePage />} />
             </Route>
+            {/* <Route path="/" element={<Preference />} /> */}
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/profile" element={<ProfilePage />} />
@@ -56,7 +57,6 @@ createRoot(document.getElementById("root")).render(
             <Route path="/teach" element={<TeachSkillsPage />} />
             <Route path="/learn" element={<LearnSkillsPage />} />
             <Route path="/app" element={<App />} />
-            <Route path="/homepage" element={<HomePage />} />
             <Route path="/userdetail" element={<UserDetail />} />
           </Routes>
         </BrowserRouter>

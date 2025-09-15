@@ -32,52 +32,53 @@ const TeachSkillsPage = ({ setUserData }) => {
     );
   };
 
-  const handleNext = async () => {
-    if (selected.length === 0) {
-      alert("Please select at least one skill you can teach!");
-      return;
-    }
 
+const handleNext = async () => {
+  if (selected.length === 0) {
+    alert("Please select at least one skill you can teach!");
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem("token");
+    const decoded = jwtDecode(token);
+    const userId = decoded.id;
+
+    const response = await fetch(
+      `http://localhost:5000/canteachpreferences/${userId}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ preferences: selected }),
+      }
+    );
+
+    let data = {};
     try {
-      const token = localStorage.getItem("token");
-      const decoded = jwtDecode(token);
-      const userId = decoded.id;
-
-      const response = await fetch(
-        `http://localhost:5000/canteachpreferences/${userId}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ preferences: selected }),
-        }
-      );
-
-      let data = {};
-      try {
-        data = await response.json();
-      } catch {
-        console.warn("No JSON returned from server");
-      }
-
-      if (!response.ok) {
-        const msg =
-          data?.message || `Request failed with status ${response.status}`;
-        throw new Error(msg);
-      }
-
-      navigate("/app");
-    } catch (error) {
-      console.error("Error saving canTeach skills:", error.message);
-      alert("Failed to save skills. Try again!");
+      data = await response.json();
+    } catch {
+      console.warn("No JSON returned from server");
     }
-  };
+
+    if (!response.ok) {
+      const msg = data?.message || `Request failed with status ${response.status}`;
+      throw new Error(msg);
+    }
+
+    localStorage.setItem("canTeachPreferences", JSON.stringify(data.canTeachPreferences));
+
+    navigate("/"); 
+  } catch (error) {
+    console.error("Error saving canTeach skills:", error.message);
+    alert("Failed to save skills. Try again!");
+  }
+};
 
   return (
     <div style={styles.wrapper}>
-      {/* Animated background elements */}
       <div style={styles.backgroundElements}>
         <div style={styles.circle1}></div>
         <div style={styles.circle2}></div>
