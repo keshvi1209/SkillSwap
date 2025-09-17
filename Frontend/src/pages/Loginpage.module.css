@@ -1,13 +1,13 @@
 .loginpage {
-  width: 100vw;   
-  height: 100vh; 
+  width: 100vw;
+  height: 100vh;
   display: flex;
   flex-direction: row;
   align-items: center;
   background: linear-gradient(to right, #007cf0, #00dfd8);
 }
 
-.leftContainer{
+.leftContainer {
   width: 50%;
   height: 100%;
   display: flex;
@@ -23,15 +23,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-image: url('..\assets\Background.jpeg');
-  background-size: cover;        
-  background-position: center;   
-  background-repeat: no-repeat;  
+  background-image: url("/src/assets/Background.jpeg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
-
-.imageContainer
-{
+.imageContainer {
   width: 550px;
   height: 550px;
   align-items: center;
