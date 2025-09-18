@@ -245,16 +245,7 @@ const UserDetail = () => {
 
   const fetchUserDetails = async (id) => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/getusercompletedetails/${id}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await api.get(`/getusercompletedetails/${id}`);
 
       const data = await response.json();
       setUser(data);

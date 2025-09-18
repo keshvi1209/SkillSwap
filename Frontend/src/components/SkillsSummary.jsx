@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styles from "./SkillsSummary.module.css";
 import Addedskillssummary from "../components/Addedskillssummary.jsx";
+import api from "../api";
 
 function SkillsSummary() {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,13 +19,7 @@ function SkillsSummary() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("http://localhost:5000/getcanteachskills", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+       const response = await api.get("/getcanteachskills");
 
       if (!response.ok) {
         throw new Error("Failed to fetch canTeach skills");

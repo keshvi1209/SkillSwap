@@ -44,17 +44,9 @@ const handleNext = async () => {
     const decoded = jwtDecode(token);
     const userId = decoded.id;
 
-    const response = await fetch(
-      `http://localhost:5000/canteachpreferences/${userId}`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ preferences: selected }),
-      }
-    );
+    const response = await api.patch(`/canteachpreferences/${userId}`, {
+    preferences: selected,
+  });
 
     let data = {};
     try {

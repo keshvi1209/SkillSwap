@@ -103,15 +103,7 @@ export default function HomePage() {
   useEffect(() => {
     const fetchRecommendations = async () => {
       try {
-        const recRes = await fetch(
-          `http://localhost:5000/recommendations/${currentUserId}`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const recRes = await api.get(`/recommendations/${currentUserId}`);
 
         if (!recRes.ok) {
           throw new Error(`HTTP error! status: ${recRes.status}`);
@@ -128,12 +120,7 @@ export default function HomePage() {
 
         const detailsPromises = ids.map(async (id) => {
           try {
-            const res = await fetch(`http://localhost:5000/getdetails/${id}`, {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
+             const res = await api.get(`/getdetails/${id}`);
             return res.ok ? res.json() : null;
           } catch (err) {
             console.error(`Failed to fetch details for user ${id}`, err);

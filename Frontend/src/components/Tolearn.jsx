@@ -59,14 +59,8 @@ function Tolearn() {
     
     const token = localStorage.getItem("token");
     try {
-      const response = await fetch("http://localhost:5000/tolearnskills", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload), 
-      });
+      const response = await api.post("/tolearnskills", payload);
+
 
       const result = await response.json();
       console.log("Upload success:", result);

@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import AvailabilityCard from "./AvailabilityCard.jsx";
 import SuccessAlert from "./SuccessAlert.jsx";
+import api from "../api";
+
 
 function EditCanteach() {
   const location = useLocation();
@@ -30,13 +32,7 @@ function EditCanteach() {
     const fetchData = async () => {
       const token = localStorage.getItem("token");
       try {
-        const response = await fetch(
-          `http://localhost:5000/editcanteachskills/${id}`,
-          {
-            method: "GET",
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+         const response = await api.get(`/editcanteachskills/${id}`);
 
         const result = await response.json();
 
