@@ -2,50 +2,41 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import "./login.css";
+import api from "../api";
+
 
 function Signup() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword , setShowPassword] = useState(false);
+
+const signup_submit = async (e) => {
+  e.preventDefault();
   const navigate = useNavigate();
 
-  const signup_submit = (e) => {
-    e.preventDefault();
+  try {
+    const response = await api.post("/signup", { name, email, password });
+    const data = response.data;
 
-    fetch("http://localhost:5000/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name, email, password }),
-    })
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        } else if (res.status === 401) {
-          alert("Unauthorized: Invalid credentials");
-          throw new Error("Unauthorized");
-        } else if (res.status === 400) {
-          alert("Bad Request: Please fill all fields correctly");
-          throw new Error("Bad Request");
-        } else if (res.status === 404) {
-          alert("Signup route not found (404)");
-          throw new Error("Not Found");
-        } else {
-          alert("Signup failed with status: " + res.status);
-          throw new Error("Signup failed");
-        }
-      })
-      .then((data) => {
-        console.log("Server response:", data);
-        navigate("/login");
-      })
-      .catch((error) => {
-        console.error("Error during signup:", error.message);
-      });
-  };
+    console.log("Server response:", data);
+    navigate("/login"); // redirect to login after successful signup
+  } catch (error) {
+    const status = error.response?.status;
 
+    if (status === 401) {
+      alert("Unauthorized: Invalid credentials");
+    } else if (status === 400) {
+      alert("Bad Request: Please fill all fields correctly");
+    } else if (status === 404) {
+      alert("Signup route not found (404)");
+    } else {
+      alert("Signup failed with status: " + (status || error.message));
+    }
+
+    console.error("Error during signup:", error.message);
+  }
+};
   return (
     <form className="form" onSubmit={signup_submit}>
       <div className="flex-column">

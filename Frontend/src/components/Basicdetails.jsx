@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import {jwtDecode} from "jwt-decode";
+import api from "../api";
 
 function Basicdetails() {
   const token = localStorage.getItem("token");
@@ -31,17 +32,8 @@ function Basicdetails() {
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:5000/getupdateddetails/${user.id}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${user.token}`,
-            },
-          }
-        );
-
+      const response = await api.get(`/getupdateddetails/${user.id}`);
+    
         if (response.ok) {
           const userData = await response.json();
           setFormData({

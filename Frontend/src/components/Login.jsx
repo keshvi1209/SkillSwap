@@ -3,54 +3,48 @@ import "./login.css";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import api from "../api";
+
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  const login_submit = async (e) => {
+  e.preventDefault();
   const navigate = useNavigate();
 
-  const login_submit = (e) => {
-    e.preventDefault();
+  try {
+    const response = await api.post("/login", { email, password });
+    
+    const data = response.data;
+    console.log("Server response:", data);
 
-    fetch("http://localhost:5000/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    })
-      .then((res) => {
-        if (res.status === 200) {
-          return res.json();
-        } else if (res.status === 401) {
-          alert("Unauthorized: Invalid email or password");
-          throw new Error("Unauthorized");
-        } else {
-          alert("Login failed with status: " + res.status);
-          throw new Error("Login failed");
-        }
-      })
-      .then((data) => {
-        console.log("Server response:", data);
-        if (data.token) {
-          localStorage.setItem("token", data.token);
-          const decoded = jwtDecode(data.token);
-          localStorage.setItem("userid", decoded.id); // Refresh token in localStorage
-          localStorage.setItem("name", decoded.name);
-          localStorage.setItem("email", decoded.email);
-          console.log("Decoded JWT:", decoded);
+    if (data.token) {
+      localStorage.setItem("token", data.token);
 
-          navigate("/");
-        } else {
-          alert("Token not found in response");
-          throw new Error("Token missing");
-        }
-      })
-      .catch((error) => {
-        console.error("Error during login:", error);
-      });
-  };
+      const decoded = jwtDecode(data.token);
+      localStorage.setItem("userid", decoded.id);
+      localStorage.setItem("name", decoded.name);
+      localStorage.setItem("email", decoded.email);
+      console.log("Decoded JWT:", decoded);
+
+      navigate("/"); 
+    } else {
+      alert("Token not found in response");
+      throw new Error("Token missing");
+    }
+
+  } catch (error) {
+    if (error.response?.status === 401) {
+      alert("Unauthorized: Invalid email or password");
+    } else {
+      alert("Login failed: " + (error.response?.status || error.message));
+    }
+    console.error("Error during login:", error);
+  }
+};
 
   return (
     <form className="form" onSubmit={login_submit}>

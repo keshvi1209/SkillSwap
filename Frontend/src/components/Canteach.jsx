@@ -2,6 +2,7 @@ import { useState } from "react";
 import styles from "../pages/SkillsEntry.module.css";
 import AvailabilityCard from "./AvailabilityCard";
 import SuccessAlert from "./SuccessAlert.jsx";
+import api from "../api";
 
 function Canteach() {
   const [showCard, setShowCard] = useState(false);
@@ -96,13 +97,7 @@ function Canteach() {
 
     const token = localStorage.getItem("token");
     try {
-      const response = await fetch("http://localhost:5000/canteachskills", {
-        method: "POST",
-        body: data,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await api.post("/canteachskills", data);
 
       const result = await response.json();
       console.log("Upload success:", result);
