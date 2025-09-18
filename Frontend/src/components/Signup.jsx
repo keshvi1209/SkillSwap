@@ -10,10 +10,11 @@ function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword , setShowPassword] = useState(false);
+  const navigate = useNavigate();
+
 
 const signup_submit = async (e) => {
   e.preventDefault();
-  const navigate = useNavigate();
 
   try {
     const response = await api.post("/signup", { name, email, password });

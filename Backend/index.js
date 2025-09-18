@@ -16,7 +16,7 @@ const __dirname = path.dirname(__filename);
 
 const allowedOrigins = [
   "https://skill-swap-jet-one.vercel.app", // your deployed frontend
-  "http://localhost:5000",                 // local Vite frontend
+  "http://localhost:5173",                 // local Vite frontend
 ];
 
 app.use(

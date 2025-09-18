@@ -42,14 +42,16 @@ function AuthInitializer({ children }) {
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <AuthProvider>
-      <AuthInitializer>
-        <BrowserRouter>
+    {/* BrowserRouter outside ensures all routing hooks work correctly */}
+    <BrowserRouter>
+      {/* AuthProvider wraps everything that needs authentication */}
+      <AuthProvider>
+        {/* AuthInitializer can safely use useAuth here */}
+        <AuthInitializer>
           <Routes>
             <Route element={<Entrypage />}>
               <Route path="/" element={<HomePage />} />
             </Route>
-            {/* <Route path="/" element={<Preference />} /> */}
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/profile" element={<ProfilePage />} />
@@ -59,8 +61,8 @@ createRoot(document.getElementById("root")).render(
             <Route path="/app" element={<App />} />
             <Route path="/userdetail" element={<UserDetail />} />
           </Routes>
-        </BrowserRouter>
-      </AuthInitializer>
-    </AuthProvider>
+        </AuthInitializer>
+      </AuthProvider>
+    </BrowserRouter>
   </StrictMode>
 );
