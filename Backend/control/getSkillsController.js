@@ -27,7 +27,7 @@ export const getToLearnSkills = async (req, res) => {
     console.log("ToLearn Skills:", user.toLearn);
     res.status(200).json({ toLearn: user.toLearn });
   } catch (error) {
-    console.error("Error fetching canTeach skills:", error);
+    console.error("Error fetching toLearn skills:", error);
     res.status(500).json({ error: "Server error" });
   }
 };

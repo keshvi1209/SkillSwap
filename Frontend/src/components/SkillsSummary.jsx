@@ -19,13 +19,9 @@ function SkillsSummary() {
     setLoading(true);
     setError(null);
     try {
-       const response = await api.get("/getcanteachskills");
+      const response = await api.get("/getcanteachskills");
+      const data = response.data;
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch canTeach skills");
-      }
-
-      const data = await response.json();
       console.log("CanTeach API Response:", data);
 
       if (data.canTeach && Array.isArray(data.canTeach)) {
@@ -36,7 +32,7 @@ function SkillsSummary() {
       }
     } catch (error) {
       console.error("Error fetching canTeach skills:", error);
-      setError(error.message);
+      setError(error.response?.data?.message || error.message);
       setSkills([]);
     } finally {
       setLoading(false);
@@ -48,22 +44,11 @@ function SkillsSummary() {
     setLoading2(true);
     setError2(null);
     try {
-      const response = await fetch("http://localhost:5000/gettolearnskills", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const response = await api.get("/gettolearnskills");
+      const data = response.data;
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch toLearn skills");
-      }
-
-      const data = await response.json();
       console.log("ToLearn API Response:", data);
 
-      // 👇 Use "toLearn" (not canTeach) if your API sends that
       if (data.toLearn && Array.isArray(data.toLearn)) {
         setSkills2(data.toLearn);
       } else {
@@ -72,7 +57,7 @@ function SkillsSummary() {
       }
     } catch (error) {
       console.error("Error fetching toLearn skills:", error);
-      setError2(error.message);
+      setError2(error.response?.data?.message || error.message);
       setSkills2([]);
     } finally {
       setLoading2(false);

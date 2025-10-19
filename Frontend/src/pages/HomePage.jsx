@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import { motion } from "framer-motion";
+import { useAuth } from "../context/AuthContext";
+import api from "../api";
 import Header from "../components/Header";
 
 const Card = ({ children, className = "", onClick, style }) => (
@@ -40,12 +43,7 @@ const Input = ({ className = "", ...props }) => (
   </div>
 );
 
-const Button = ({
-  children,
-  className = "",
-  variant = "primary",
-  ...props
-}) => {
+const Button = ({ children, className = "", variant = "primary", ...props }) => {
   const baseClasses =
     "px-6 py-3 rounded-full font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 transform hover:scale-105";
 
@@ -95,21 +93,40 @@ export default function HomePage() {
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const token = localStorage.getItem("token");
   const decodedtoken = token ? jwtDecode(token) : null;
   const currentUserId = decodedtoken ? decodedtoken.id : null;
 
+  const headingText = `Welcome, ${user?.name || 'User'} !`;
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.05,
+      },
+    },
+  };
+
+  const letterVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.3 },
+    },
+  };
+
   useEffect(() => {
     const fetchRecommendations = async () => {
       try {
+        // ✅ axios returns data directly
         const recRes = await api.get(`/recommendations/${currentUserId}`);
+        const recData = recRes.data;
 
-        if (!recRes.ok) {
-          throw new Error(`HTTP error! status: ${recRes.status}`);
-        }
-
-        const recData = await recRes.json();
         console.log("Fetched recommendations:", recData);
         const ids = recData.recommendations;
 
@@ -118,10 +135,11 @@ export default function HomePage() {
           return;
         }
 
+        // fetch all details in parallel
         const detailsPromises = ids.map(async (id) => {
           try {
-             const res = await api.get(`/getdetails/${id}`);
-            return res.ok ? res.json() : null;
+            const res = await api.get(`/getdetails/${id}`);
+            return res.data;
           } catch (err) {
             console.error(`Failed to fetch details for user ${id}`, err);
             return null;
@@ -161,7 +179,28 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 font-sans antialiased text-gray-200">
       <Header />
 
-      <div className="flex flex-col items-center justify-center py-16 px-2 bg-gradient-to-br from-gray-800 to-gray-900">
+      {/* Welcome Section with Animation */}
+      <div className="flex flex-col items-center justify-center py-8 px-2 bg-gradient-to-br from-gray-800 to-gray-900">
+        <motion.div
+          key={user?.name}
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="relative z-10 text-center"
+        >
+          <h1 className="text-4xl md:text-6xl font-bold text-center mb-6">
+            {headingText.split("").map((char, index) => (
+              <motion.span 
+                key={index} 
+                variants={letterVariants}
+                className="bg-gradient-to-r from-[#6C63FF] to-[#4a3fdb] bg-clip-text text-transparent"
+              >
+                {char === " " ? "\u00A0" : char}
+              </motion.span>
+            ))}
+          </h1>
+        </motion.div>
+
         <div className="text-center max-w-3xl mx-auto animate-fade-in-up">
           <h1 className="text-4xl md:text-5xl font-extrabold mb-6 text-white">
             Discover Your Next{" "}
@@ -220,7 +259,7 @@ export default function HomePage() {
                   <h2 className="text-xl font-bold text-white mb-2">
                     {item.name || "Unknown User"}
                   </h2>
-              
+
                   <p className="text-sm text-gray-500 mb-4">
                     {item.city && item.state
                       ? `${item.city}, ${item.state}`
@@ -271,7 +310,6 @@ export default function HomePage() {
                     </div>
                   </div>
 
-                  {/* Show star rating if available */}
                   {item.rating !== undefined && (
                     <div className="mb-4">
                       <StarRating rating={item.rating} />

@@ -1,6 +1,9 @@
+// src/pages/LearnSkillsPage.jsx
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import api from "../api"; // ✅ axios instance
 
 const allFields = [
   "Art",
@@ -24,6 +27,7 @@ const fields = [...allFields, "Other"];
 
 const LearnSkillsPage = ({ setUserData }) => {
   const [selected, setSelected] = useState([]);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const toggleField = (field) => {
@@ -32,45 +36,56 @@ const LearnSkillsPage = ({ setUserData }) => {
     );
   };
 
-  // In your LearnSkillsPage handleNext function, replace the localStorage line:
-
   const handleNext = async () => {
     if (selected.length === 0) {
       alert("Please select at least one skill you want to learn!");
       return;
     }
 
+    setLoading(true);
+
     try {
       const token = localStorage.getItem("token");
+      if (!token) {
+        alert("No token found. Please log in again.");
+        navigate("/login");
+        return;
+      }
+
       const decoded = jwtDecode(token);
       const userId = decoded.id;
 
+      // ✅ Axios automatically attaches Authorization from interceptor
       const response = await api.patch(`/tolearnpreferences/${userId}`, {
-    preferences: selected,
-  });
+        preferences: selected,
+      });
 
-      let data = {};
-      try {
-        data = await response.json();
-      } catch {
-        console.warn("No JSON returned from server");
+      const data = response.data;
+
+      // ✅ Save updated preferences
+      localStorage.setItem(
+        "toLearnPreferences",
+        JSON.stringify(data.toLearnPreferences)
+      );
+
+      // ✅ Update parent state if passed
+      if (setUserData) {
+        setUserData((prev) => ({
+          ...prev,
+          toLearnPreferences: data.toLearnPreferences,
+        }));
       }
-
-      if (!response.ok) {
-        const msg =
-          data?.message || `Request failed with status ${response.status}`;
-        throw new Error(msg);
-      }
-
-      // FIXED: Store the user object properly
-      localStorage.setItem("toLearnPreferences", JSON.stringify(data.toLearnPreferences));
 
       navigate("/teach");
     } catch (error) {
-      console.error("Error saving toLearn skills:", error.message);
-      alert("Failed to save skills. Try again!");
+      console.error("Error saving toLearn skills:", error);
+      const msg = error.response?.data?.message || "Failed to save skills. Try again!";
+      alert(msg);
+    } finally {
+      setLoading(false);
     }
   };
+
   return (
     <div style={styles.wrapper}>
       {/* Animated background elements */}
@@ -129,21 +144,21 @@ const LearnSkillsPage = ({ setUserData }) => {
 
         <div style={styles.footer}>
           <p style={styles.selectionText}>
-            {selected.length} {selected.length === 1 ? "skill" : "skills"}{" "}
-            selected
+            {selected.length} {selected.length === 1 ? "skill" : "skills"} selected
           </p>
           <button
             onClick={handleNext}
             style={{
               ...styles.button,
-              opacity: selected.length === 0 ? 0.7 : 1,
-              cursor: selected.length === 0 ? "not-allowed" : "pointer",
+              opacity: selected.length === 0 || loading ? 0.7 : 1,
+              cursor:
+                selected.length === 0 || loading ? "not-allowed" : "pointer",
             }}
-            disabled={selected.length === 0}
+            disabled={selected.length === 0 || loading}
             className="skill-select-button"
           >
-            Continue
-            <span style={styles.arrow}>→</span>
+            {loading ? "Saving..." : "Continue"}
+            {!loading && <span style={styles.arrow}>→</span>}
           </button>
         </div>
       </div>
@@ -155,17 +170,14 @@ const LearnSkillsPage = ({ setUserData }) => {
             0%, 100% { transform: translateY(0) rotate(0deg); }
             50% { transform: translateY(-20px) rotate(5deg); }
           }
-          
           @keyframes pulse {
             0%, 100% { opacity: 0.5; transform: scale(1); }
             50% { opacity: 0.8; transform: scale(1.05); }
           }
-          
           @keyframes rotate {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
           }
-          
           @keyframes move {
             0% { transform: translateY(0) translateX(0) rotate(0deg); }
             25% { transform: translateY(-30px) translateX(20px) rotate(90deg); }
@@ -173,37 +185,14 @@ const LearnSkillsPage = ({ setUserData }) => {
             75% { transform: translateY(30px) translateX(20px) rotate(270deg); }
             100% { transform: translateY(0) translateX(0) rotate(360deg); }
           }
-          
           @keyframes drift {
             0% { transform: translateX(0) translateY(0); }
             100% { transform: translateX(100px) translateY(50px); }
           }
-          
-          .floating {
-            animation: float 8s ease-in-out infinite;
-          }
-          
-          .pulse {
-            animation: pulse 6s ease-in-out infinite;
-          }
-          
-          .rotate {
-            animation: rotate 20s linear infinite;
-          }
-          
-          .move {
-            animation: move 15s ease-in-out infinite;
-          }
-          
-          .drift {
-            animation: drift 12s ease-in-out infinite alternate;
-          }
-          
           .skill-select-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(108, 99, 255, 0.6);
           }
-          
           .skill-select-button:hover span {
             transform: translateX(3px);
           }
@@ -228,7 +217,7 @@ const styles = {
     color: "#e0e0e0",
   },
   backgroundElements: {
-    position: "Absolute",
+    position: "absolute",
     top: 0,
     left: 0,
     width: "100%",
@@ -313,7 +302,8 @@ const styles = {
     height: "120px",
     background:
       "linear-gradient(135deg, rgba(108, 99, 255, 0.06) 0%, rgba(74, 63, 219, 0.06) 100%)",
-    clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+    clipPath:
+      "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
     animation: "rotate 30s linear infinite",
   },
   particle: {
@@ -404,7 +394,6 @@ const styles = {
     gap: "15px",
     justifyContent: "center",
   },
-
   card: {
     padding: "8px 16px",
     borderRadius: "15px",
@@ -417,10 +406,11 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     width: "fit-content",
-    minWidth: "100px", // ⬅️ ensures a minimum size
-    height: "48px", // consistent height
+    minWidth: "100px",
+    height: "48px",
     whiteSpace: "nowrap",
     border: "1px solid #ccc",
+    position: "relative",
   },
   checkmark: {
     position: "absolute",

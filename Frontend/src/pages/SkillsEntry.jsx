@@ -1,30 +1,37 @@
 import React, { useState } from "react";
-import styles from "./SkillsEntry.module.css";
 import Canteach from "../components/Canteach.jsx";
 import Tolearn from "../components/Tolearn.jsx";
 
 function SkillsEntry() {
-  const [Activestate, setActivestate] = useState("canteach");
+  const [activeState, setActiveState] = useState("canteach");
 
   return (
-    <div className={styles.container}>
-      <div className={styles.mainform}>
-        <div className={styles.buttoncontainer}>
+    <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
+      <div className="bg-[rgba(25,25,35,0.9)] rounded-2xl shadow-2xl p-8 backdrop-blur-sm border border-white/10">
+        <div className="flex border-b border-white/10 mb-8">
           <button
-            className={`${styles.cardselect1} ${Activestate === "canteach" ? styles.active : ""}`}
-            onClick={() => setActivestate("canteach")}
+            className={`flex-1 py-4 px-6 font-semibold text-lg transition-all duration-200 ${
+              activeState === "canteach"
+                ? "text-[#6C63FF] border-b-2 border-[#6C63FF] bg-purple-500/10"
+                : "text-gray-400 hover:text-gray-300"
+            }`}
+            onClick={() => setActiveState("canteach")}
           >
             Can Teach
           </button>
           <button
-            className={`${styles.cardselect2} ${Activestate === "tolearn" ? styles.active : ""}`}
-            onClick={() => setActivestate("tolearn")}
+            className={`flex-1 py-4 px-6 font-semibold text-lg transition-all duration-200 ${
+              activeState === "tolearn"
+                ? "text-[#6C63FF] border-b-2 border-[#6C63FF] bg-purple-500/10"
+                : "text-gray-400 hover:text-gray-300"
+            }`}
+            onClick={() => setActiveState("tolearn")}
           >
             To Learn
           </button>
         </div>
 
-        {Activestate === "canteach" ? <Canteach /> : <Tolearn />}
+        {activeState === "canteach" ? <Canteach /> : <Tolearn />}
       </div>
     </div>
   );

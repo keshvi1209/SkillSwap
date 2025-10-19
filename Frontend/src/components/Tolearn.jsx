@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import styles from "../pages/SkillsEntry.module.css";
 import SuccessAlert from "./SuccessAlert.jsx";
+import api from "../api";
 
 function Tolearn() {
   const [formData, setFormData] = useState({
@@ -60,8 +60,6 @@ function Tolearn() {
     const token = localStorage.getItem("token");
     try {
       const response = await api.post("/tolearnskills", payload);
-
-
       const result = await response.json();
       console.log("Upload success:", result);
 
@@ -84,71 +82,70 @@ function Tolearn() {
   };
 
   return (
-    <form className={styles.canteachform} onSubmit={handleSubmit}>
-      <div className={styles.rowContainer}>
-        <div className={styles.selectContainer}>
-          <label className={styles.inputhead}>
-            Skill<span className={styles.required}>*</span>
-          </label>
-          <input
-            type="text"
-            className={styles.input}
-            placeholder="Enter your skill"
-            name="skill"
-            value={formData.skill}
-            onChange={handleChange}
-            required
-          />
-        </div>
+    <form className="space-y-6" onSubmit={handleSubmit}>
+      {/* Skill Input */}
+      <div>
+        <label className="block text-sm font-semibold text-gray-300 mb-3">
+          Skill <span className="text-red-400">*</span>
+        </label>
+        <input
+          type="text"
+          className="w-full px-4 py-3 bg-[rgba(45,45,55,0.7)] border border-white/10 rounded-xl focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] text-white placeholder-gray-400 transition-all duration-200"
+          placeholder="Enter the skill you want to learn"
+          name="skill"
+          value={formData.skill}
+          onChange={handleChange}
+          required
+        />
       </div>
 
-      <div className={styles.rowContainer}>
-        <div className={styles.selectContainer}>
-          <label className={styles.inputhead}>
-            Current Proficiency Level<span className={styles.required}>*</span>
-          </label>
-          <select
-            className={styles.select}
-            name="proficiency"
-            value={formData.proficiency}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Select</option>
-            <option value="beginner">Beginner</option>
-            <option value="intermediate">Intermediate</option>
-            <option value="advanced">Advanced</option>
-          </select>
-        </div>
+      {/* Proficiency Level */}
+      <div>
+        <label className="block text-sm font-semibold text-gray-300 mb-3">
+          Current Proficiency Level <span className="text-red-400">*</span>
+        </label>
+        <select
+          className="w-full px-4 py-3 bg-[rgba(45,45,55,0.7)] border border-white/10 rounded-xl focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] text-white transition-all duration-200"
+          name="proficiency"
+          value={formData.proficiency}
+          onChange={handleChange}
+          required
+        >
+          <option value="" className="bg-[#2d2d37]">Select your current level</option>
+          <option value="beginner" className="bg-[#2d2d37]">Beginner</option>
+          <option value="intermediate" className="bg-[#2d2d37]">Intermediate</option>
+          <option value="advanced" className="bg-[#2d2d37]">Advanced</option>
+        </select>
       </div>
 
-      <div className={styles.rowContainer}>
-        <div className={styles.modeselectContainer}>
-          <label className={styles.inputhead}>
-            Preferred Mode of Learning<span className={styles.required}>*</span>
+      {/* Mode and Languages Row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label className="block text-sm font-semibold text-gray-300 mb-3">
+            Preferred Mode of Learning <span className="text-red-400">*</span>
           </label>
           <select
-            className={styles.select}
+            className="w-full px-4 py-3 bg-[rgba(45,45,55,0.7)] border border-white/10 rounded-xl focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] text-white transition-all duration-200"
             name="mode"
             value={formData.mode}
             onChange={handleChange}
             required
           >
-            <option value="">Select</option>
-            <option value="online">Online</option>
-            <option value="offline">Offline</option>
-            <option value="both">Both</option>
+            <option value="" className="bg-[#2d2d37]">Select mode</option>
+            <option value="online" className="bg-[#2d2d37]">Online</option>
+            <option value="offline" className="bg-[#2d2d37]">Offline</option>
+            <option value="both" className="bg-[#2d2d37]">Both</option>
           </select>
         </div>
 
-        <div className={styles.languageselectContainer}>
-          <label className={styles.inputhead}>
-            Preferred Language(s)<span className={styles.required}>*</span>
+        <div>
+          <label className="block text-sm font-semibold text-gray-300 mb-3">
+            Preferred Language(s) <span className="text-red-400">*</span>
           </label>
           <input
             type="text"
-            className={styles.input}
-            placeholder="Languages you want to learn in"
+            className="w-full px-4 py-3 bg-[rgba(45,45,55,0.7)] border border-white/10 rounded-xl focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] text-white placeholder-gray-400 transition-all duration-200"
+            placeholder="e.g., English, Hindi, Spanish"
             name="languages"
             value={rawLanguages}
             onChange={handleChange}
@@ -157,35 +154,37 @@ function Tolearn() {
         </div>
       </div>
 
-      <div className={styles.rowContainer}>
-        <div className={styles.yearelectContainer}>
-          <label className={styles.inputhead}>
-            Tags<span className={styles.required}>*</span>
-          </label>
-          <input
-            type="text"
-            className={styles.input}
-            placeholder="Add tags (e.g., #Python, #DataScience)"
-            name="tags"
-            value={rawTags}
-            onChange={handleChange}
-            required
-          />
-        </div>
+      {/* Tags */}
+      <div>
+        <label className="block text-sm font-semibold text-gray-300 mb-3">
+          Tags <span className="text-red-400">*</span>
+        </label>
+        <input
+          type="text"
+          className="w-full px-4 py-3 bg-[rgba(45,45,55,0.7)] border border-white/10 rounded-xl focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] text-white placeholder-gray-400 transition-all duration-200"
+          placeholder="Add relevant tags (e.g., Python, Data Science, Web Development)"
+          name="tags"
+          value={rawTags}
+          onChange={handleChange}
+          required
+        />
       </div>
 
-      <div className={styles.rowContainer}>
-        <div className={styles.submitContainer}>
-          <button type="submit" className={styles.submitbutton}>
-            Submit
-          </button>
-        </div>
+      {/* Submit Buttons */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6">
+        <button
+          type="submit"
+          className="w-full px-6 py-3 bg-gradient-to-r from-[#6C63FF] to-[#4a3fdb] text-white font-semibold rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-purple-500/25 hover:-translate-y-0.5 focus:ring-2 focus:ring-[#6C63FF] focus:ring-offset-2 focus:ring-offset-[#1a1a2e] skill-submit-button"
+        >
+          Submit
+        </button>
 
-        <div className={styles.skillcheckbuttonContainer}>
-          <button type="button" className={styles.custombutton}>
-            Added skills
-          </button>
-        </div>
+        <button
+          type="button"
+          className="w-full px-6 py-3 bg-[rgba(45,45,55,0.7)] border border-white/10 text-white font-semibold rounded-xl transition-all duration-200 hover:bg-[rgba(55,55,65,0.8)] hover:-translate-y-0.5 focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-[#1a1a2e]"
+        >
+          Added skills
+        </button>
       </div>
 
       {showAlert && <SuccessAlert onClose={() => setShowAlert(false)} />}

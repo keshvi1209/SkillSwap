@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import api from "../api";
 
 function Basicdetails() {
@@ -9,11 +9,11 @@ function Basicdetails() {
     if (!token) return null;
     try {
       const decodedToken = jwtDecode(token);
-      return { 
-        id: decodedToken.id, 
-        name: decodedToken.name, 
-        email: decodedToken.email, 
-        token 
+      return {
+        id: decodedToken.id,
+        name: decodedToken.name,
+        email: decodedToken.email,
+        token,
       };
     } catch (error) {
       console.error("Invalid token:", error);
@@ -32,17 +32,15 @@ function Basicdetails() {
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-      const response = await api.get(`/getupdateddetails/${user.id}`);
-    
-        if (response.ok) {
-          const userData = await response.json();
-          setFormData({
-            contact: userData.contact || "",
-            address: userData.address || "",
-            city: userData.city || "",
-            state: userData.state || "",
-          });
-        }
+        const response = await api.get(`/getupdateddetails/${user.id}`);
+        const userData = response.data;
+
+        setFormData({
+          contact: userData.contact || "",
+          address: userData.address || "",
+          city: userData.city || "",
+          state: userData.state || "",
+        });
       } catch (error) {
         console.error("Error fetching user details:", error);
       }
@@ -61,20 +59,12 @@ function Basicdetails() {
   const handleSave = async () => {
     setSaveStatus("saving");
     try {
-      const response = await fetch("http://localhost:5000/updatedetails", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-        body: JSON.stringify({ userId: user.id, ...formData }),
+      await api.put("/updatedetails", {
+        userId: user.id,
+        ...formData,
       });
 
-      if (response.ok) {
-        setSaveStatus("saved");
-      } else {
-        throw new Error("Failed to save");
-      }
+      setSaveStatus("saved");
     } catch (error) {
       console.error("Error saving details:", error);
       setSaveStatus("error");
