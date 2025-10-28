@@ -1,10 +1,8 @@
 import { useState } from "react";
-import AvailabilityCard from "./AvailabilityCard";
 import SuccessAlert from "./SuccessAlert.jsx";
 import api from "../api";
 
 function Canteach() {
-  const [showCard, setShowCard] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -17,14 +15,10 @@ function Canteach() {
     languages: [],
     certificates: [],
     tags: [],
-    availability: null,
   });
 
   const [rawTags, setRawTags] = useState("");
   const [rawLanguages, setRawLanguages] = useState("");
-
-  const showAvailabilityPopup = () => setShowCard(true);
-  const closeCard = () => setShowCard(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -64,23 +58,10 @@ function Canteach() {
     }));
   };
 
-  const handleAvailabilitySave = (availabilityData) => {
-    setFormData((prev) => ({
-      ...prev,
-      availability: availabilityData,
-    }));
-    closeCard();
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (isSubmitting) return;
-
-    if (!formData.availability || formData.availability.length === 0) {
-      alert("Please set your availability.");
-      return;
-    }
 
     setIsSubmitting(true);
 
@@ -94,9 +75,6 @@ function Canteach() {
       data.append("proficiency", formData.proficiency);
       data.append("mode", formData.mode);
       
-      // Append availability as JSON string
-      data.append("availability", JSON.stringify(formData.availability));
-
       // Append arrays - FIXED: Remove brackets from field names
       formData.languages.forEach((lang) => data.append("languages", lang));
       formData.tags.forEach((tag) => data.append("tags", tag));
@@ -113,7 +91,6 @@ function Canteach() {
         mode: formData.mode,
         languages: formData.languages,
         tags: formData.tags,
-        availability: formData.availability,
         certificateCount: formData.certificates.length
       });
 
@@ -139,7 +116,6 @@ function Canteach() {
           languages: [],
           certificates: [],
           tags: [],
-          availability: null,
         });
         setRawTags("");
         setRawLanguages("");
@@ -194,7 +170,7 @@ function Canteach() {
         <div>
           <label className="block text-sm font-semibold text-gray-300 mb-3">
             Description <span className="text-red-400">*</span>
-          </label>
+            </label>
           <textarea
             className="w-full px-4 py-3 bg-[rgba(45,45,55,0.7)] border border-white/10 rounded-xl focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] text-white placeholder-gray-400 transition-all duration-200 resize-none"
             placeholder="Describe your skill"
@@ -206,7 +182,7 @@ function Canteach() {
           ></textarea>
         </div>
 
-        {/* Proficiency and Availability Row */}
+        {/* Proficiency and Mode Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-semibold text-gray-300 mb-3">
@@ -227,40 +203,6 @@ function Canteach() {
           </div>
 
           <div>
-            <button
-              type="button"
-              className={`w-full px-4 py-3 font-semibold rounded-xl transition-all duration-200 ${
-                formData.availability 
-                  ? "bg-gradient-to-r from-green-600 to-green-700 text-white hover:shadow-lg hover:shadow-green-500/25"
-                  : "bg-gradient-to-r from-[#6C63FF] to-[#4a3fdb] text-white hover:shadow-lg hover:shadow-purple-500/25"
-              } hover:-translate-y-0.5 focus:ring-2 focus:ring-[#6C63FF] focus:ring-offset-2 focus:ring-offset-[#1a1a2e]`}
-              onClick={showAvailabilityPopup}
-            >
-              {formData.availability 
-                ? `Availability Set (${formData.availability.length} slots)` 
-                : "Set Availability"
-              } <span className="text-red-300">*</span>
-            </button>
-
-            {showCard && (
-              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-                <div 
-                  className="bg-[rgba(25,25,35,0.95)] rounded-2xl shadow-2xl border border-white/10 max-w-md w-full"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <AvailabilityCard
-                    closeCard={closeCard}
-                    saveAvailability={handleAvailabilitySave}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Mode and Languages Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
             <label className="block text-sm font-semibold text-gray-300 mb-3">
               Mode of Teaching <span className="text-red-400">*</span>
             </label>
@@ -277,7 +219,10 @@ function Canteach() {
               <option value="both" className="bg-[#2d2d37]">Both</option>
             </select>
           </div>
+        </div>
 
+        {/* Languages and Tags Row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-semibold text-gray-300 mb-3">
               Languages <span className="text-red-400">*</span>
@@ -288,6 +233,21 @@ function Canteach() {
               placeholder="e.g., English, Hindi"
               name="languages"
               value={rawLanguages}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-300 mb-3">
+              Tags <span className="text-red-400">*</span>
+            </label>
+            <input
+              type="text"
+              className="w-full px-4 py-3 bg-[rgba(45,45,55,0.7)] border border-white/10 rounded-xl focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] text-white placeholder-gray-400 transition-all duration-200"
+              placeholder="e.g., Python, Data Science"
+              name="tags"
+              value={rawTags}
               onChange={handleChange}
               required
             />
@@ -306,22 +266,6 @@ function Canteach() {
             className="w-full px-4 py-3 bg-[rgba(45,45,55,0.7)] border border-white/10 rounded-xl focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#6C63FF] file:text-white hover:file:bg-[#5a52d5] transition-all duration-200"
             name="certificates"
             onChange={handleFileChange}
-          />
-        </div>
-
-        {/* Tags */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-300 mb-3">
-            Tags <span className="text-red-400">*</span>
-          </label>
-          <input
-            type="text"
-            className="w-full px-4 py-3 bg-[rgba(45,45,55,0.7)] border border-white/10 rounded-xl focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] text-white placeholder-gray-400 transition-all duration-200"
-            placeholder="e.g., Python, Data Science"
-            name="tags"
-            value={rawTags}
-            onChange={handleChange}
-            required
           />
         </div>
 

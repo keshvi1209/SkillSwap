@@ -124,6 +124,7 @@ export default function HomePage() {
     const fetchRecommendations = async () => {
       try {
         // ✅ axios returns data directly
+        // console.log("Fetching recommendations for user ID:", currentUserId);
         const recRes = await api.get(`/recommendations/${currentUserId}`);
         const recData = recRes.data;
 

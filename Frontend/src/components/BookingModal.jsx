@@ -21,7 +21,8 @@ const BookingModal = ({ skill, user, isOpen, onClose, onConfirm }) => {
     const upcomingDays = generateUpcomingWeek();
 
     const availabilityWithDates = upcomingDays.map(({ dayName, date }) => {
-      const slots = skill.availability?.filter(slot => slot.day === dayName) || [];
+      const slots =
+        skill.availability?.filter((slot) => slot.day === dayName) || [];
       return { dayName, date, slots };
     });
 
@@ -40,42 +41,60 @@ const BookingModal = ({ skill, user, isOpen, onClose, onConfirm }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-gray-900 w-full max-w-3xl p-6 rounded-2xl relative shadow-lg overflow-y-auto max-h-[90vh]">
         <button
-          onClick={() => { onClose(); setSelectedSlot(null); }}
+          onClick={() => {
+            onClose();
+            setSelectedSlot(null);
+          }}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-100"
         >
           ✕
         </button>
 
-        <h2 className="text-2xl font-bold text-gray-100 mb-4">Book a Session: {skill.skill}</h2>
+        <h2 className="text-2xl font-bold text-gray-100 mb-4">
+          Book a Session: {skill.skill}
+        </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {upcomingAvailability.map(({ dayName, date, slots }) => (
             <div key={date} className="border border-gray-700 rounded-lg p-3">
               <h3 className="text-gray-300 font-semibold mb-2">
-                {dayName}, {date.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                {dayName},{" "}
+                {date.toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                })}
               </h3>
               {slots.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {slots.map((slot, idx) => {
                     const isSelected =
-                      selectedSlot?.day === dayName && selectedSlot?.startTime === slot.startTime;
+                      selectedSlot?.day === dayName &&
+                      selectedSlot?.startTime === slot.startTime;
+
+                    const isDisabled = !slot.isAvailable;
 
                     return (
                       <button
                         key={idx}
-                        onClick={() =>
-                          setSelectedSlot({
-                            day: dayName,
-                            date,
-                            startTime: slot.startTime,
-                            endTime: slot.endTime
-                          })
-                        }
-                        className={`px-3 py-1.5 rounded border ${
-                          isSelected
-                            ? "bg-teal-600 border-teal-400 text-white"
-                            : "bg-gray-800 border-gray-700 text-gray-200 hover:bg-gray-700"
-                        }`}
+                        onClick={() => {
+                          if (!isDisabled) {
+                            setSelectedSlot({
+                              day: dayName,
+                              date,
+                              startTime: slot.startTime,
+                              endTime: slot.endTime,
+                            });
+                          }
+                        }}
+                        disabled={isDisabled} // 👈 disable unavailable slots
+                        className={`px-3 py-1.5 rounded border text-sm transition-colors duration-200
+        ${
+          isDisabled
+            ? "bg-gray-800 border-gray-700 text-gray-500 cursor-not-allowed opacity-50"
+            : isSelected
+            ? "bg-teal-600 border-teal-400 text-white"
+            : "bg-gray-800 border-gray-700 text-gray-200 hover:bg-gray-700"
+        }`}
                       >
                         {slot.startTime} - {slot.endTime}
                       </button>
@@ -91,7 +110,10 @@ const BookingModal = ({ skill, user, isOpen, onClose, onConfirm }) => {
 
         <div className="mt-6 flex justify-end gap-3">
           <button
-            onClick={() => { onClose(); setSelectedSlot(null); }}
+            onClick={() => {
+              onClose();
+              setSelectedSlot(null);
+            }}
             className="px-4 py-2 bg-gray-700 text-gray-200 rounded hover:bg-gray-600"
           >
             Cancel
@@ -100,7 +122,7 @@ const BookingModal = ({ skill, user, isOpen, onClose, onConfirm }) => {
             onClick={handleConfirm}
             className="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-500"
           >
-            Confirm Booking
+            Request to book
           </button>
         </div>
       </div>

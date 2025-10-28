@@ -15,6 +15,9 @@ import HomePage from "./pages/HomePage.jsx";
 import App from "./App.jsx";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import UserDetail from "./pages/UserDetail.jsx";
+import RequestDetails from "./components/RequestDetails.jsx";
+import ReceivedRequests from "./components/ReceivedRequests.jsx";
+import AvailabilityPage from "./pages/AvailabilityPage.jsx";
 
 function AuthInitializer({ children }) {
   const { setUser } = useAuth();
@@ -42,11 +45,8 @@ function AuthInitializer({ children }) {
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    {/* BrowserRouter outside ensures all routing hooks work correctly */}
     <BrowserRouter>
-      {/* AuthProvider wraps everything that needs authentication */}
       <AuthProvider>
-        {/* AuthInitializer can safely use useAuth here */}
         <AuthInitializer>
           <Routes>
             <Route element={<Entrypage />}>
@@ -60,6 +60,15 @@ createRoot(document.getElementById("root")).render(
             <Route path="/learn" element={<LearnSkillsPage />} />
             <Route path="/app" element={<App />} />
             <Route path="/userdetail" element={<UserDetail />} />
+            <Route path="/RequestDetails" element={<RequestDetails />} />
+            <Route path="/ReceivedRequests" element={<ReceivedRequests />} />
+            <Route
+              path="/availability"
+              element={
+                <AvailabilityPage
+                />
+              }
+            />
           </Routes>
         </AuthInitializer>
       </AuthProvider>

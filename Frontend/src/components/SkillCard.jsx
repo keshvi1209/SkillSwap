@@ -83,7 +83,7 @@ const SkillCard = ({ skill, user, onBookSlot }) => {
           )}
 
           {/* Weekly Schedule */}
-          {skill.availability?.length > 0 && (
+          {/* {skill.availability?.length > 0 && (
             <div className="space-y-2">
               <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
                 <svg className="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -108,7 +108,7 @@ const SkillCard = ({ skill, user, onBookSlot }) => {
                 ))}
               </div>
             </div>
-          )}
+          )} */}
         </div>
 
         {/* Book Slot Button */}
@@ -137,3 +137,4 @@ const SkillCard = ({ skill, user, onBookSlot }) => {
 };
 
 export default SkillCard;
+

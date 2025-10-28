@@ -43,8 +43,8 @@ const allDays = [
   "Sunday",
 ];
 
-function AvailabilityCard({ closeCard, saveAvailability }) {
-  const [availability, setAvailability] = useState([]);
+function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
+  const [availability, setAvailability] = useState(initialData || []);
   const [isDailySame, setIsDailySame] = useState(false);
   const [slot, setSlot] = useState({
     day: "",
@@ -89,6 +89,29 @@ function AvailabilityCard({ closeCard, saveAvailability }) {
     });
   };
 
+  const getSlotsForDay = (day) => {
+    return availability.filter(slot => slot.day === day);
+  };
+
+  const hasTimeOverlap = (newSlot, existingSlots) => {
+    const newStart = convertTo24hr(newSlot.startTime);
+    const newEnd = convertTo24hr(newSlot.endTime);
+
+    for (const existingSlot of existingSlots) {
+      const existingStart = convertTo24hr(existingSlot.startTime);
+      const existingEnd = convertTo24hr(existingSlot.endTime);
+
+      if (
+        (newStart >= existingStart && newStart < existingEnd) ||
+        (newEnd > existingStart && newEnd <= existingEnd) ||
+        (newStart <= existingStart && newEnd >= existingEnd)
+      ) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   const addSlot = () => {
     const {
       day,
@@ -114,40 +137,47 @@ function AvailabilityCard({ closeCard, saveAvailability }) {
     const startTime = `${startHour}:${startMinute} ${startPeriod}`;
     const endTime = `${endHour}:${endMinute} ${endPeriod}`;
 
+    // Validate time logic
+    const startTime24 = convertTo24hr(startTime);
+    const endTime24 = convertTo24hr(endTime);
+    
+    if (startTime24 >= endTime24) {
+      alert("End time must be after start time");
+      return;
+    }
+
     let newSlots = [];
 
     if (isDailySame) {
       // Create slots for all days
-      const existingDays = new Set(availability.map((a) => a.day));
-      newSlots = allDays
-        .filter((day) => !existingDays.has(day))
-        .map((day) => ({ 
-          day, 
-          startTime, 
-          endTime,
-          startTime24: convertTo24hr(startTime),
-          endTime24: convertTo24hr(endTime)
-        }));
+      newSlots = allDays.map((day) => ({
+        day,
+        startTime,
+        endTime,
+        startTime24,
+        endTime24,
+      }));
     } else {
-      // Check for existing slot on the same day
-      const existingSlot = availability.find((a) => a.day === day);
-      if (existingSlot) {
-        alert(
-          `A slot for ${day} already exists. Please remove it first or select a different day.`
-        );
+      const newSlot = {
+        day,
+        startTime,
+        endTime,
+        startTime24,
+        endTime24,
+      };
+
+      // Check for time overlap with existing slots for the same day
+      const existingSlots = getSlotsForDay(day);
+      if (hasTimeOverlap(newSlot, existingSlots)) {
+        alert(`Time slot overlaps with existing slot for ${day}. Please choose a different time.`);
         return;
       }
-      newSlots.push({ 
-        day, 
-        startTime, 
-        endTime,
-        startTime24: convertTo24hr(startTime),
-        endTime24: convertTo24hr(endTime)
-      });
+
+      newSlots.push(newSlot);
     }
 
     if (newSlots.length === 0) {
-      alert("No new slots to add. All days might already have slots.");
+      alert("No new slots to add.");
       return;
     }
 
@@ -161,7 +191,7 @@ function AvailabilityCard({ closeCard, saveAvailability }) {
       startMinute: "",
       endHour: "",
       endMinute: "",
-      ...(isDailySame ? {} : { day: "" }),
+      ...(isDailySame ? {} : { day: prev.day }), // Keep the day selected for multiple slots
     }));
   };
 
@@ -174,10 +204,19 @@ function AvailabilityCard({ closeCard, saveAvailability }) {
       alert("Please add at least one availability slot");
       return;
     }
-    
-    // Pass the availability data back to Canteach component
+
+    // Pass the availability data back to parent component
     saveAvailability(availability);
   };
+
+  // Group slots by day for better display
+  const groupedSlots = availability.reduce((acc, slot) => {
+    if (!acc[slot.day]) {
+      acc[slot.day] = [];
+    }
+    acc[slot.day].push(slot);
+    return acc;
+  }, {});
 
   // Time Input Component
   const TimeInput = ({
@@ -191,21 +230,19 @@ function AvailabilityCard({ closeCard, saveAvailability }) {
     onChange,
   }) => (
     <div className="flex flex-col">
-      <label className="block text-sm font-semibold text-gray-300 mb-2">
+      <label className="block text-sm font-semibold text-white mb-3">
         {label}
       </label>
-      <div className="flex gap-2">
+      <div className="flex gap-3">
         <select
           name={hourName}
           value={hourValue}
           onChange={onChange}
-          className="flex-1 px-3 py-2 bg-[rgba(45,45,55,0.7)] border border-white/10 rounded-lg text-white text-sm focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] transition-all duration-200"
+          className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] transition-all duration-200 backdrop-blur-lg"
         >
-          <option value="" className="bg-[#2d2d37]">
-            Hr
-          </option>
+          <option value="" className="bg-[#1a1a2e]">Hour</option>
           {generateTimeOptions("hour").map((h) => (
-            <option key={h} value={h} className="bg-[#2d2d37]">
+            <option key={h} value={h} className="bg-[#1a1a2e]">
               {h}
             </option>
           ))}
@@ -215,13 +252,11 @@ function AvailabilityCard({ closeCard, saveAvailability }) {
           name={minuteName}
           value={minuteValue}
           onChange={onChange}
-          className="flex-1 px-3 py-2 bg-[rgba(45,45,55,0.7)] border border-white/10 rounded-lg text-white text-sm focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] transition-all duration-200"
+          className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] transition-all duration-200 backdrop-blur-lg"
         >
-          <option value="" className="bg-[#2d2d37]">
-            Min
-          </option>
+          <option value="" className="bg-[#1a1a2e]">Minute</option>
           {generateTimeOptions("minute").map((m) => (
-            <option key={m} value={m} className="bg-[#2d2d37]">
+            <option key={m} value={m} className="bg-[#1a1a2e]">
               {m}
             </option>
           ))}
@@ -231,10 +266,10 @@ function AvailabilityCard({ closeCard, saveAvailability }) {
           name={periodName}
           value={periodValue}
           onChange={onChange}
-          className="flex-1 px-3 py-2 bg-[rgba(45,45,55,0.7)] border border-white/10 rounded-lg text-white text-sm focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] transition-all duration-200"
+          className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] transition-all duration-200 backdrop-blur-lg"
         >
           {generateTimeOptions("period").map((p) => (
-            <option key={p} value={p} className="bg-[#2d2d37]">
+            <option key={p} value={p} className="bg-[#1a1a2e]">
               {p}
             </option>
           ))}
@@ -244,149 +279,198 @@ function AvailabilityCard({ closeCard, saveAvailability }) {
   );
 
   return (
-    // ADDED THE MISSING CONTAINER DIV
-    <div className="bg-[rgba(25,25,35,0.95)] rounded-2xl shadow-2xl border border-white/10 w-full max-w-md mx-auto">
+    <div className="w-full">
       {/* Header */}
-      <div className="p-6 border-b border-white/10">
-        <h3 className="text-xl font-bold text-white text-center">
-          Set Your Availability
-        </h3>
-        <p className="text-gray-400 text-sm text-center mt-1">
-          Add your available time slots
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-bold text-white mb-2">
+          Manage Your Time Slots
+        </h2>
+        <p className="text-gray-300">
+          Add and manage your teaching availability
         </p>
       </div>
 
-      {/* Form */}
-      <div className="p-6 space-y-4">
-        {/* Day Selection */}
-        <div className="flex flex-col">
-          <label className="block text-sm font-semibold text-gray-300 mb-2">
-            Select Day
-          </label>
-          <select
-            name="day"
-            value={slot.day}
-            onChange={handleChange}
-            disabled={isDailySame}
-            className="w-full px-4 py-3 bg-[rgba(45,45,55,0.7)] border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <option value="" className="bg-[#2d2d37]">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Left Side - Form */}
+        <div className="space-y-6">
+          {/* Day Selection */}
+          <div className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 p-6">
+            <label className="block text-sm font-semibold text-white mb-3">
               Select Day
-            </option>
-            {allDays.map((day) => (
-              <option key={day} value={day} className="bg-[#2d2d37]">
-                {day}
-              </option>
-            ))}
-          </select>
-        </div>
+            </label>
+            <select
+              name="day"
+              value={slot.day}
+              onChange={handleChange}
+              disabled={isDailySame}
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] transition-all duration-200 backdrop-blur-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <option value="" className="bg-[#1a1a2e]">Choose a day</option>
+              {allDays.map((day) => (
+                <option key={day} value={day} className="bg-[#1a1a2e]">
+                  {day}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        {/* Time Inputs */}
-        <div className="grid grid-cols-1 gap-4">
-          <TimeInput
-            label="Start Time"
-            hourName="startHour"
-            minuteName="startMinute"
-            periodName="startPeriod"
-            hourValue={slot.startHour}
-            minuteValue={slot.startMinute}
-            periodValue={slot.startPeriod}
-            onChange={handleChange}
-          />
+          {/* Time Inputs */}
+          <div className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 p-6">
+            <div className="grid grid-cols-1 gap-6">
+              <TimeInput
+                label="Start Time"
+                hourName="startHour"
+                minuteName="startMinute"
+                periodName="startPeriod"
+                hourValue={slot.startHour}
+                minuteValue={slot.startMinute}
+                periodValue={slot.startPeriod}
+                onChange={handleChange}
+              />
 
-          <TimeInput
-            label="End Time"
-            hourName="endHour"
-            minuteName="endMinute"
-            periodName="endPeriod"
-            hourValue={slot.endHour}
-            minuteValue={slot.endMinute}
-            periodValue={slot.endPeriod}
-            onChange={handleChange}
-          />
-        </div>
+              <TimeInput
+                label="End Time"
+                hourName="endHour"
+                minuteName="endMinute"
+                periodName="endPeriod"
+                hourValue={slot.endHour}
+                minuteValue={slot.endMinute}
+                periodValue={slot.endPeriod}
+                onChange={handleChange}
+              />
+            </div>
 
-        {/* Daily Same Checkbox */}
-        <div className="flex items-center pt-2">
-          <input
-            id="daily-same"
-            name="isDailySame"
-            type="checkbox"
-            checked={isDailySame}
-            onChange={handleChange}
-            className="h-4 w-4 text-[#6C63FF] border-white/20 rounded focus:ring-[#6C63FF] bg-[rgba(45,45,55,0.7)]"
-          />
-          <label
-            htmlFor="daily-same"
-            className="ml-3 text-sm font-medium text-gray-300"
-          >
-            Apply same time to all days
-          </label>
-        </div>
-
-        {/* Add Slot Button */}
-        <button
-          type="button"
-          onClick={addSlot}
-          className="w-full px-4 py-3 bg-gradient-to-r from-[#6C63FF] to-[#4a3fdb] text-white font-semibold rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-purple-500/25 hover:-translate-y-0.5 focus:ring-2 focus:ring-[#6C63FF] focus:ring-offset-2 focus:ring-offset-[#1a1a2e]"
-        >
-          {isDailySame ? "Add Daily Slots" : "Add Time Slot"}
-        </button>
-      </div>
-
-      {/* Slots List */}
-      <div className="px-6 pb-4">
-        <h4 className="text-sm font-bold text-gray-300 mb-3">
-          Current Slots ({availability.length})
-        </h4>
-        <div className="space-y-2 max-h-40 overflow-y-auto pr-2">
-          {availability.length === 0 ? (
-            <p className="text-gray-500 text-sm text-center py-4">
-              No slots added yet
-            </p>
-          ) : (
-            availability.map((a, index) => (
-              <div
-                key={index}
-                className="flex justify-between items-center bg-[rgba(108,99,255,0.1)] border border-[#6C63FF]/20 rounded-lg px-4 py-3"
+            {/* Daily Same Checkbox */}
+            <div className="flex items-center pt-4 mt-4 border-t border-white/10">
+              <input
+                id="daily-same"
+                name="isDailySame"
+                type="checkbox"
+                checked={isDailySame}
+                onChange={handleChange}
+                className="h-5 w-5 text-[#6C63FF] border-white/20 rounded focus:ring-2 focus:ring-[#6C63FF] bg-white/5"
+              />
+              <label
+                htmlFor="daily-same"
+                className="ml-3 text-sm font-medium text-white"
               >
-                <div className="text-white text-sm">
-                  <span className="font-semibold text-[#6C63FF]">
-                    {a.day.substring(0, 3)}
-                  </span>
-                  : {a.startTime} - {a.endTime}
+                Apply same schedule to all weekdays
+              </label>
+            </div>
+          </div>
+
+          {/* Add Slot Button */}
+          <button
+            type="button"
+            onClick={addSlot}
+            className="w-full px-6 py-4 bg-gradient-to-r from-[#6C63FF] to-[#4a3fdb] text-white font-semibold rounded-2xl transition-all duration-200 hover:shadow-lg hover:shadow-purple-500/25 hover:-translate-y-1 focus:ring-2 focus:ring-[#6C63FF] focus:ring-offset-2 focus:ring-offset-[#1a1a2e]"
+          >
+            <div className="flex items-center justify-center">
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              {isDailySame ? "Add Weekly Schedule" : "Add Time Slot"}
+            </div>
+          </button>
+        </div>
+
+        {/* Right Side - Slots List */}
+        <div className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-white">
+              Your Schedule
+            </h3>
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-sm text-gray-300">
+                {availability.length} slot{availability.length !== 1 ? 's' : ''}
+              </span>
+            </div>
+          </div>
+
+          <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
+            {availability.length === 0 ? (
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => removeSlot(index)}
-                  className="text-red-400 hover:text-red-300 font-bold text-lg transition-colors duration-200"
-                  aria-label="Remove slot"
-                >
-                  ×
-                </button>
+                <p className="text-gray-400 text-sm">
+                  No time slots added yet. Start by adding your first availability slot.
+                </p>
               </div>
-            ))
-          )}
+            ) : (
+              Object.entries(groupedSlots).map(([day, slots]) => (
+                <div key={day} className="bg-white/5 rounded-xl border border-white/10 p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-semibold text-[#6C63FF] text-sm uppercase tracking-wide">
+                      {day}
+                    </h4>
+                    <span className="text-xs text-gray-400 bg-white/5 px-2 py-1 rounded-lg">
+                      {slots.length} session{slots.length > 1 ? 's' : ''}
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    {slots.map((slot, index) => {
+                      const globalIndex = availability.findIndex(s => 
+                        s.day === slot.day && 
+                        s.startTime === slot.startTime && 
+                        s.endTime === slot.endTime
+                      );
+                      return (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between bg-gradient-to-r from-[#6C63FF]/10 to-purple-500/10 border border-[#6C63FF]/20 rounded-lg px-4 py-3 group hover:border-[#6C63FF]/40 transition-all duration-200"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className="w-2 h-2 bg-[#6C63FF] rounded-full"></div>
+                            <span className="text-white font-medium text-sm">
+                              {slot.startTime} - {slot.endTime}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => removeSlot(globalIndex)}
+                            className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 font-bold text-lg transition-all duration-200 p-1 hover:bg-red-500/10 rounded"
+                            aria-label="Remove slot"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="flex justify-between p-6 border-t border-white/10">
+      <div className="flex justify-between items-center pt-8 mt-8 border-t border-white/10">
         <button
           type="button"
           onClick={closeCard}
-          className="px-6 py-2 bg-[rgba(45,45,55,0.7)] border border-white/10 text-white font-medium rounded-xl transition-all duration-200 hover:bg-[rgba(55,55,65,0.8)] hover:-translate-y-0.5"
+          className="px-8 py-3 bg-white/5 border border-white/10 text-white font-medium rounded-2xl transition-all duration-200 hover:bg-white/10 hover:-translate-y-0.5 backdrop-blur-lg"
         >
           Cancel
         </button>
-        <button
-          type="button"
-          onClick={handleSave}
-          disabled={availability.length === 0}
-          className="px-6 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white font-medium rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-green-500/25 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-        >
-          Save Availability
-        </button>
+        
+        <div className="flex items-center space-x-4">
+          <span className="text-sm text-gray-300">
+            {availability.length} time slot{availability.length !== 1 ? 's' : ''} configured
+          </span>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={availability.length === 0}
+            className="px-8 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-medium rounded-2xl transition-all duration-200 hover:shadow-lg hover:shadow-green-500/25 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none backdrop-blur-lg"
+          >
+            Save Schedule
+          </button>
+        </div>
       </div>
     </div>
   );
