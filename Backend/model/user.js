@@ -15,7 +15,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
     canTeach: [{ type: mongoose.Schema.Types.ObjectId, ref: "Canteach" }],
     toLearn: [{ type: mongoose.Schema.Types.ObjectId, ref: "ToLearn" }],
 

@@ -3,11 +3,9 @@ import User from "../model/user.js";
 export const getCanTeachSkills = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).populate("canTeach");
-
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-
     console.log("CanTeach Skills:", user.canTeach);
     res.status(200).json({ canTeach: user.canTeach });
   } catch (error) {

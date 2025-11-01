@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-// Helper Functions for Time
 const convertTo24hr = (time12) => {
   if (!time12) return "";
   const [time, period] = time12.split(" ");
@@ -44,7 +43,27 @@ const allDays = [
 ];
 
 function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
-  const [availability, setAvailability] = useState(initialData || []);
+  const transformInitialData = (data) => {
+    if (!data || !data.availability) return [];
+
+    const flatSlots = [];
+    data.availability.forEach((dayAvailability) => {
+      dayAvailability.slots.forEach((slot) => {
+        flatSlots.push({
+          day: dayAvailability.day,
+          startTime: slot.startTime,
+          endTime: slot.endTime,
+          startTime24: slot.startTime24,
+          endTime24: slot.endTime24,
+        });
+      });
+    });
+    return flatSlots;
+  };
+
+  const [availability, setAvailability] = useState(
+    transformInitialData(initialData) || []
+  );
   const [isDailySame, setIsDailySame] = useState(false);
   const [slot, setSlot] = useState({
     day: "",
@@ -90,7 +109,7 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
   };
 
   const getSlotsForDay = (day) => {
-    return availability.filter(slot => slot.day === day);
+    return availability.filter((slot) => slot.day === day);
   };
 
   const hasTimeOverlap = (newSlot, existingSlots) => {
@@ -137,10 +156,9 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
     const startTime = `${startHour}:${startMinute} ${startPeriod}`;
     const endTime = `${endHour}:${endMinute} ${endPeriod}`;
 
-    // Validate time logic
     const startTime24 = convertTo24hr(startTime);
     const endTime24 = convertTo24hr(endTime);
-    
+
     if (startTime24 >= endTime24) {
       alert("End time must be after start time");
       return;
@@ -149,7 +167,6 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
     let newSlots = [];
 
     if (isDailySame) {
-      // Create slots for all days
       newSlots = allDays.map((day) => ({
         day,
         startTime,
@@ -166,10 +183,11 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
         endTime24,
       };
 
-      // Check for time overlap with existing slots for the same day
       const existingSlots = getSlotsForDay(day);
       if (hasTimeOverlap(newSlot, existingSlots)) {
-        alert(`Time slot overlaps with existing slot for ${day}. Please choose a different time.`);
+        alert(
+          `Time slot overlaps with existing slot for ${day}. Please choose a different time.`
+        );
         return;
       }
 
@@ -184,19 +202,49 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
     const updated = [...availability, ...newSlots];
     setAvailability(sortAvailability(updated));
 
-    // Reset time inputs but keep day if not daily same
     setSlot((prev) => ({
       ...prev,
       startHour: "",
       startMinute: "",
       endHour: "",
       endMinute: "",
-      ...(isDailySame ? {} : { day: prev.day }), // Keep the day selected for multiple slots
+      ...(isDailySame ? {} : { day: prev.day }),
     }));
   };
 
   const removeSlot = (index) => {
     setAvailability(availability.filter((_, i) => i !== index));
+  };
+
+  const transformToMongoFormat = (flatSlots) => {
+    const dayMap = {};
+
+    flatSlots.forEach((slot) => {
+      if (!dayMap[slot.day]) {
+        dayMap[slot.day] = {
+          day: slot.day,
+          slots: [],
+        };
+      }
+
+      dayMap[slot.day].slots.push({
+        startTime: slot.startTime,
+        endTime: slot.endTime,
+        startTime24: slot.startTime24,
+        endTime24: slot.endTime24,
+        booked: false,
+        bookedBy: null,
+      });
+    });
+
+    // Sort slots within each day by start time
+    Object.values(dayMap).forEach((dayAvailability) => {
+      dayAvailability.slots.sort((a, b) =>
+        a.startTime24.localeCompare(b.startTime24)
+      );
+    });
+
+    return Object.values(dayMap);
   };
 
   const handleSave = () => {
@@ -205,11 +253,19 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
       return;
     }
 
-    // Pass the availability data back to parent component
-    saveAvailability(availability);
+    const mongoFormat = {
+      availability: transformToMongoFormat(availability),
+    };
+
+    // ✅ Added console log to preview final MongoDB-ready data
+    console.log(
+      "🧾 Final data being saved to MongoDB format:",
+      JSON.stringify(mongoFormat, null, 2)
+    );
+
+    saveAvailability(mongoFormat);
   };
 
-  // Group slots by day for better display
   const groupedSlots = availability.reduce((acc, slot) => {
     if (!acc[slot.day]) {
       acc[slot.day] = [];
@@ -218,7 +274,6 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
     return acc;
   }, {});
 
-  // Time Input Component
   const TimeInput = ({
     label,
     hourName,
@@ -240,7 +295,9 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
           onChange={onChange}
           className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] transition-all duration-200 backdrop-blur-lg"
         >
-          <option value="" className="bg-[#1a1a2e]">Hour</option>
+          <option value="" className="bg-[#1a1a2e]">
+            Hour
+          </option>
           {generateTimeOptions("hour").map((h) => (
             <option key={h} value={h} className="bg-[#1a1a2e]">
               {h}
@@ -254,7 +311,9 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
           onChange={onChange}
           className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] transition-all duration-200 backdrop-blur-lg"
         >
-          <option value="" className="bg-[#1a1a2e]">Minute</option>
+          <option value="" className="bg-[#1a1a2e]">
+            Minute
+          </option>
           {generateTimeOptions("minute").map((m) => (
             <option key={m} value={m} className="bg-[#1a1a2e]">
               {m}
@@ -280,7 +339,6 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
 
   return (
     <div className="w-full">
-      {/* Header */}
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-white mb-2">
           Manage Your Time Slots
@@ -291,9 +349,7 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Left Side - Form */}
         <div className="space-y-6">
-          {/* Day Selection */}
           <div className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 p-6">
             <label className="block text-sm font-semibold text-white mb-3">
               Select Day
@@ -305,7 +361,9 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
               disabled={isDailySame}
               className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] transition-all duration-200 backdrop-blur-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <option value="" className="bg-[#1a1a2e]">Choose a day</option>
+              <option value="" className="bg-[#1a1a2e]">
+                Choose a day
+              </option>
               {allDays.map((day) => (
                 <option key={day} value={day} className="bg-[#1a1a2e]">
                   {day}
@@ -314,7 +372,6 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
             </select>
           </div>
 
-          {/* Time Inputs */}
           <div className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 p-6">
             <div className="grid grid-cols-1 gap-6">
               <TimeInput
@@ -340,7 +397,6 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
               />
             </div>
 
-            {/* Daily Same Checkbox */}
             <div className="flex items-center pt-4 mt-4 border-t border-white/10">
               <input
                 id="daily-same"
@@ -359,31 +415,37 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
             </div>
           </div>
 
-          {/* Add Slot Button */}
           <button
             type="button"
             onClick={addSlot}
             className="w-full px-6 py-4 bg-gradient-to-r from-[#6C63FF] to-[#4a3fdb] text-white font-semibold rounded-2xl transition-all duration-200 hover:shadow-lg hover:shadow-purple-500/25 hover:-translate-y-1 focus:ring-2 focus:ring-[#6C63FF] focus:ring-offset-2 focus:ring-offset-[#1a1a2e]"
           >
             <div className="flex items-center justify-center">
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              <svg
+                className="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
               </svg>
               {isDailySame ? "Add Weekly Schedule" : "Add Time Slot"}
             </div>
           </button>
         </div>
 
-        {/* Right Side - Slots List */}
         <div className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-white">
-              Your Schedule
-            </h3>
+            <h3 className="text-lg font-semibold text-white">Your Schedule</h3>
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
               <span className="text-sm text-gray-300">
-                {availability.length} slot{availability.length !== 1 ? 's' : ''}
+                {availability.length} slot{availability.length !== 1 ? "s" : ""}
               </span>
             </div>
           </div>
@@ -392,31 +454,46 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
             {availability.length === 0 ? (
               <div className="text-center py-8">
                 <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    className="w-8 h-8 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                 </div>
                 <p className="text-gray-400 text-sm">
-                  No time slots added yet. Start by adding your first availability slot.
+                  No time slots added yet. Start by adding your first
+                  availability slot.
                 </p>
               </div>
             ) : (
               Object.entries(groupedSlots).map(([day, slots]) => (
-                <div key={day} className="bg-white/5 rounded-xl border border-white/10 p-4">
+                <div
+                  key={day}
+                  className="bg-white/5 rounded-xl border border-white/10 p-4"
+                >
                   <div className="flex items-center justify-between mb-3">
                     <h4 className="font-semibold text-[#6C63FF] text-sm uppercase tracking-wide">
                       {day}
                     </h4>
                     <span className="text-xs text-gray-400 bg-white/5 px-2 py-1 rounded-lg">
-                      {slots.length} session{slots.length > 1 ? 's' : ''}
+                      {slots.length} session{slots.length > 1 ? "s" : ""}
                     </span>
                   </div>
                   <div className="space-y-2">
                     {slots.map((slot, index) => {
-                      const globalIndex = availability.findIndex(s => 
-                        s.day === slot.day && 
-                        s.startTime === slot.startTime && 
-                        s.endTime === slot.endTime
+                      const globalIndex = availability.findIndex(
+                        (s) =>
+                          s.day === slot.day &&
+                          s.startTime === slot.startTime &&
+                          s.endTime === slot.endTime
                       );
                       return (
                         <div
@@ -457,10 +534,11 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
         >
           Cancel
         </button>
-        
+
         <div className="flex items-center space-x-4">
           <span className="text-sm text-gray-300">
-            {availability.length} time slot{availability.length !== 1 ? 's' : ''} configured
+            {availability.length} time slot
+            {availability.length !== 1 ? "s" : ""} configured
           </span>
           <button
             type="button"

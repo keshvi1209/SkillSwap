@@ -13,7 +13,6 @@ const canteachSchema = new mongoose.Schema(
     mode: { type: String, enum: ["online", "offline", "both"], required: true },
     languages: { type: [String], required: true },
     tags: { type: [String], required: true },
-    availability: { type: Object, required: true },
     certificates: [String], 
   },
   {

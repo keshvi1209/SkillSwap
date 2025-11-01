@@ -10,6 +10,7 @@ import { setCanTeachPreferences, setToLearnPreferences } from "../control/SetPre
 import recommendations from "../control/recommendationController.js";
 import {getDetails,getusercompletedetails} from "../control/getDetailsController.js";
 import { getupdateddetails,updatedetails } from "../control/basicDetailsController.js";
+import { saveAvailability } from "../control/availabilityController.js";
 
 const router = Router();
 
@@ -39,5 +40,6 @@ router.get("/getdetails/:id", getDetails);
 router.get("/getupdateddetails/:id", getupdateddetails);
 router.put("/updatedetails", updatedetails);
 router.get("/getusercompletedetails/:id", getusercompletedetails);
+router.post("/saveavailability", saveAvailability);
 
 export default router;

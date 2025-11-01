@@ -27,7 +27,6 @@ export const canteachskills = async (req, res) => {
       { $push: { canTeach: newEntry._id } },
       { new: true }
     );
-
     console.log("👤 Updated user with new skill:", updatedUser);
 
     res.status(201).json({ message: "Skill added successfully!", data: newEntry });
