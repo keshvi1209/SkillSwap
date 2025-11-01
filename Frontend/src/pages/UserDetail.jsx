@@ -70,12 +70,6 @@ const UserDetail = () => {
     setShowFeedbackForm(false);
   };
 
-  const handleBookSlot = (bookingDetails) => {
-    console.log("Booking details:", bookingDetails);
-    alert(
-      `Booking confirmed for ${bookingDetails.skill} on ${bookingDetails.date} at ${bookingDetails.time}`
-    );
-  };
 
   const calculateAverageRating = () => {
     if (!mockFeedback.length) return 0;
@@ -116,8 +110,7 @@ const UserDetail = () => {
             {activeTab === "teach" && (
               <TeachTab 
                 skills={user.canTeach} 
-                user={user} 
-                onBookSlot={handleBookSlot} 
+                userId={userId} 
               />
             )}
 

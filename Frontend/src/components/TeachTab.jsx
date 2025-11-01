@@ -1,7 +1,7 @@
 import SkillCard from "./SkillCard";
 import EmptyState from "./EmptyState";
 
-const TeachTab = ({ skills, user, onBookSlot }) => {
+const TeachTab = ({ skills, userId }) => {
   if (!skills || skills.length === 0) {
     return (
       <EmptyState
@@ -19,7 +19,7 @@ const TeachTab = ({ skills, user, onBookSlot }) => {
   return (
     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
       {skills.map((skill) => (
-        <SkillCard key={skill._id} skill={skill} user={user} onBookSlot={onBookSlot} />
+        <SkillCard key={skill._id} skill={skill} userId={userId}/>
       ))}
     </div>
   );

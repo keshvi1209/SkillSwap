@@ -3,7 +3,7 @@ import ProficiencyBadge from "./ProficiencyBadge";
 import ModeBadge from "./ModeBadge";
 import BookingModal from "./BookingModal";
 
-const SkillCard = ({ skill, user, onBookSlot }) => {
+const SkillCard = ({ skill, userId }) => {
   const [showBookingModal, setShowBookingModal] = useState(false);
 
   const handleBookSlot = () => setShowBookingModal(true);
@@ -126,8 +126,8 @@ const SkillCard = ({ skill, user, onBookSlot }) => {
       </div>
 
       <BookingModal
-        skill={skill}
-        user={user}
+        // skill={skill}
+        userId={userId}
         isOpen={showBookingModal}
         onClose={() => setShowBookingModal(false)}
         onConfirm={handleConfirmBooking}
