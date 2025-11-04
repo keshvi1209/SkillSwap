@@ -62,13 +62,7 @@ createRoot(document.getElementById("root")).render(
             <Route path="/userdetail" element={<UserDetail />} />
             <Route path="/RequestDetails" element={<RequestDetails />} />
             <Route path="/ReceivedRequests" element={<ReceivedRequests />} />
-            <Route
-              path="/availability"
-              element={
-                <AvailabilityPage
-                />
-              }
-            />
+            <Route path="/availability" element={<AvailabilityPage/>}/>
           </Routes>
         </AuthInitializer>
       </AuthProvider>

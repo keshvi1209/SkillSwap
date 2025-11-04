@@ -49,7 +49,7 @@ const UserDetail = () => {
     try {
       const response = await api.get(`/getusercompletedetails/${id}`);
       setUser(response.data);
-      console.log(response.data);
+      console.log("kdslk",response.data);
     } catch (error) {
       console.error("Error fetching user details:", error);
     }

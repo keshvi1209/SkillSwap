@@ -10,7 +10,7 @@ const SkillCard = ({ skill, userId }) => {
 
   const handleConfirmBooking = (bookingDetails) => {
     setShowBookingModal(false);
-    onBookSlot(bookingDetails);
+    // onBookSlot(bookingDetails);
   };
 
   return (
@@ -126,7 +126,7 @@ const SkillCard = ({ skill, userId }) => {
       </div>
 
       <BookingModal
-        // skill={skill}
+        skill={skill}
         userId={userId}
         isOpen={showBookingModal}
         onClose={() => setShowBookingModal(false)}
