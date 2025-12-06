@@ -22,6 +22,7 @@ import AvailabilityPage from "./pages/AvailabilityPage.jsx";
 function AuthInitializer({ children }) {
   const { setUser } = useAuth();
 
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {

@@ -120,6 +120,8 @@ export default function HomePage() {
     },
   };
 
+  
+
   useEffect(() => {
     const fetchRecommendations = async () => {
       try {

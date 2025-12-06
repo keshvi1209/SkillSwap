@@ -1,27 +1,45 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import myimage from "../assets/logo.png";
-import { useAuth } from "../context/AuthContext"; // ✅ import context
+import { useAuth } from "../context/AuthContext";
 
 function Header() {
   const navigate = useNavigate();
-  const { setUser } = useAuth(); // ✅ from AuthContext
+  const location = useLocation();
+  const { setUser } = useAuth();
 
   const features = [
+    "Home",
     "Add Skills",
-    "Search Best Fit",
+    "Received Requests",
     "Scheduled Meetings",
     "Chat",
     "Past Sessions",
   ];
-  const [active, setActive] = useState("Add Skills");
 
-  // ✅ Logout function
+  const routes = {
+    "Home": "/",
+    "Add Skills": "/app",
+    "Received Requests": "/ReceivedRequests",
+    "Scheduled Meetings": "/meetings",
+    "Chat": "/chat",
+    "Past Sessions": "/sessions",
+  };
+
+  const [active, setActive] = useState("Home");
+
+  useEffect(() => {
+    const current = Object.keys(routes).find(
+      (key) => routes[key] === location.pathname
+    );
+    if (current) setActive(current);
+  }, [location.pathname]);
+
   const handleLogout = () => {
-    localStorage.removeItem("token"); // remove token
-    setUser(null); // clear user from context
-    navigate("/login"); // redirect
+    localStorage.removeItem("token");
+    setUser(null); 
+    navigate("/login"); 
   };
 
   return (
@@ -33,14 +51,15 @@ function Header() {
         <img src={myimage} alt="Logo" className="h-10 mr-3" />
         <h1 className="text-2xl font-bold text-white">SkillSwap</h1>
       </div>
-
-      {/* Features */}
       <nav className="flex items-center space-x-8">
         {features.map((item) => (
           <div
             key={item}
             className="relative cursor-pointer py-2 text-gray-400 hover:text-white transition-colors duration-200"
-            onClick={() => setActive(item)}
+            onClick={() => {
+              setActive(item);
+              navigate(routes[item]);
+            }}
           >
             <span className="font-medium">{item}</span>
             {active === item && (
@@ -54,7 +73,6 @@ function Header() {
         ))}
       </nav>
 
-      {/* Profile + Logout */}
       <div className="flex items-center space-x-4">
         <button
           className="px-6 py-2 bg-gradient-to-r from-[#6C63FF] to-[#4a3fdb] text-white font-semibold rounded-full shadow-md hover:from-[#4a3fdb] hover:to-[#6C63FF] transition-all duration-300 transform hover:scale-105"
