@@ -22,8 +22,8 @@ import AvailabilityPage from "./pages/AvailabilityPage.jsx";
 function AuthInitializer({ children }) {
   const { setUser } = useAuth();
 
-
   useEffect(() => {
+    // Check if token already exists in localStorage (from login or OAuth callback)
     const token = localStorage.getItem("token");
     if (token) {
       try {
@@ -39,7 +39,7 @@ function AuthInitializer({ children }) {
         setUser(null);
       }
     }
-  }, []);
+  }, [setUser]);
 
   return children;
 }
@@ -63,7 +63,7 @@ createRoot(document.getElementById("root")).render(
             <Route path="/userdetail" element={<UserDetail />} />
             <Route path="/RequestDetails" element={<RequestDetails />} />
             <Route path="/ReceivedRequests" element={<ReceivedRequests />} />
-            <Route path="/availability" element={<AvailabilityPage/>}/>
+            <Route path="/availability" element={<AvailabilityPage />} />
           </Routes>
         </AuthInitializer>
       </AuthProvider>

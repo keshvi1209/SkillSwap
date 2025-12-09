@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState, useEffect } from "react"; // Added useEffect
+import { useNavigate, Link, useSearchParams } from "react-router-dom"; // Added useSearchParams
 import { jwtDecode } from "jwt-decode";
 import api from "../api";
 
@@ -9,7 +9,34 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams(); // Hook to read URL parameters
+
+  // --- NEW: Handle Google OAuth Callback ---
+  useEffect(() => {
+    const token = searchParams.get("token");
+
+    if (token) {
+      try {
+        // 1. Store the token
+        localStorage.setItem("token", token);
+
+        // 2. Decode user info
+        const decoded = jwtDecode(token);
+        localStorage.setItem("id", decoded.id);
+        localStorage.setItem("name", decoded.name);
+        localStorage.setItem("email", decoded.email);
+
+        // 3. Clear URL params (clean up the address bar) and Navigate
+        navigate("/", { replace: true });
+      } catch (error) {
+        console.error("Error decoding token from URL:", error);
+        alert("Login failed: Invalid token received");
+      }
+    }
+  }, [searchParams, navigate]); 
+  // ------------------------------------------
 
   const login_submit = async (e) => {
     e.preventDefault();
