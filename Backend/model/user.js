@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: false,
     },
     canTeach: [{ type: mongoose.Schema.Types.ObjectId, ref: "Canteach" }],
     toLearn: [{ type: mongoose.Schema.Types.ObjectId, ref: "ToLearn" }],

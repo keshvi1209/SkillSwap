@@ -14,6 +14,10 @@ import { saveAvailability , getAvailability } from "../control/availabilityContr
 import {
   createBooking,
 } from "../control/bookingController.js";
+import {
+  getReceivedRequests,
+  updateBookingStatus,
+} from "../control/handlebookingrequest.js";
 
 const router = Router();
 
@@ -45,8 +49,9 @@ router.put("/updatedetails", updatedetails);
 router.get("/getusercompletedetails/:id", getusercompletedetails);
 router.post("/saveavailability", saveAvailability);
 router.get("/getavailability/:userId", getAvailability);
-
-
 router.post('/bookings', createBooking);
+router.get("/teacher/:teacherId", getReceivedRequests);
+router.patch("/:bookingId/status", updateBookingStatus);
+
 
 export default router;

@@ -1,4 +1,3 @@
-// model/Booking.js
 import mongoose from 'mongoose';
 
 const bookingSchema = new mongoose.Schema({
@@ -14,7 +13,7 @@ const bookingSchema = new mongoose.Schema({
     endTime: { type: String }
   }],
   message: { type: String },
-  status: { type: String, default: 'pending' } // pending, confirmed, cancelled
+  status: { type: String, default: 'pending' } 
 }, { timestamps: true });
 
 export default mongoose.model('Booking', bookingSchema);
