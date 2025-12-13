@@ -1,8 +1,7 @@
 import express from "express";
 import { google } from "googleapis";
 import jwt from "jsonwebtoken";
-import User from "../model/user.js";   // <--- IMPORTANT
-
+import User from "../model/user.js";
 
 const router = express.Router();
 
@@ -37,7 +36,6 @@ router.get("/login", (req, res) => {
   return res.redirect(url);
 });
 
-
 router.get("/callback", async (req, res) => {
   try {
     const code = req.query.code;
@@ -58,9 +56,12 @@ router.get("/callback", async (req, res) => {
       user = await User.create({
         name: data.name,
         email: data.email,
-        // password optional (NOT required)
         googleId: data.id,
+        googleTokens: tokens,
       });
+    } else {
+      user.googleTokens = tokens;
+      await user.save();
     }
 
     const token = jwt.sign(
@@ -69,18 +70,16 @@ router.get("/callback", async (req, res) => {
         name: user.name,
         email: user.email,
       },
-      process.env.JWT_SECRET
+      process.env.JWT_SECRET,
     );
 
     const frontend = process.env.FRONTEND_ORIGIN || "http://localhost:5173";
     return res.redirect(`${frontend}/login?token=${token}`);
-
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: err.message });
   }
 });
-
 
 router.get("/logout", (req, res) => {
   return res.json({ success: true, message: "Logged out" });

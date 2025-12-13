@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import api from "../api.js";
 
 const RequestDetails = () => {
   const { id } = useParams();
@@ -14,8 +15,9 @@ const RequestDetails = () => {
     date: "2025-10-23",
     timeSlot: "2:00 PM - 4:00 PM",
     day: "Saturday",
-    message: "I'd like to learn Python basics this weekend. Specifically interested in data structures and basic algorithms. I have some programming experience but new to Python.",
-    status: "pending"
+    message:
+      "I'd like to learn Python basics this weekend. Specifically interested in data structures and basic algorithms. I have some programming experience but new to Python.",
+    status: "pending",
   });
 
   const availableSkills = [
@@ -23,15 +25,28 @@ const RequestDetails = () => {
     "Advanced Python",
     "Data Science with Python",
     "Web Development with Django",
-    "Automation with Python"
+    "Automation with Python",
   ];
 
-  const handleCreateMeeting = () => {
+  const handleCreateMeeting = async () => {
     if (!selectedSkill) {
       alert("Please select a skill to teach first!");
       return;
     }
-    alert(`Meeting created for ${selectedSkill} successfully!`);
+
+    try {
+      const res = await api.post("/meet/create", {
+        title: `Teaching ${selectedSkill}`,
+      });
+
+      const meetLink = res.data.meetingLink;
+
+      alert("Meeting created successfully!");
+      window.open(meetLink, "_blank"); // 🔗 open Google Meet
+    } catch (err) {
+      console.error(err);
+      alert("Failed to create meeting. Please login again.");
+    }
   };
 
   const handleAccept = () => {
@@ -53,8 +68,18 @@ const RequestDetails = () => {
         className="flex items-center gap-2 text-blue-600 hover:text-blue-800 mb-6 transition-colors font-medium"
         onClick={() => navigate("/requests")}
       >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        <svg
+          className="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+          />
         </svg>
         Back to Requests
       </button>
@@ -89,13 +114,17 @@ const RequestDetails = () => {
           </div>
           <div className="text-center">
             <p className="text-sm font-semibold text-gray-600">Time Slot</p>
-            <p className="text-lg font-bold text-gray-800">{request.timeSlot}</p>
+            <p className="text-lg font-bold text-gray-800">
+              {request.timeSlot}
+            </p>
           </div>
         </div>
 
         {/* Message Section */}
         <div className="mb-8">
-          <h3 className="text-lg font-semibold text-gray-700 mb-3">Message from {request.sender}</h3>
+          <h3 className="text-lg font-semibold text-gray-700 mb-3">
+            Message from {request.sender}
+          </h3>
           <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
             <p className="text-gray-700 leading-relaxed">{request.message}</p>
           </div>
@@ -134,8 +163,18 @@ const RequestDetails = () => {
             onClick={handleStartChat}
             className="flex items-center gap-3 bg-gray-100 text-gray-700 px-6 py-3 rounded-xl hover:bg-gray-200 transition-colors font-medium"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+              />
             </svg>
             Start Chat
           </button>

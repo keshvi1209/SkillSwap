@@ -1,6 +1,9 @@
 import express from 'express';
 import axios from 'axios';
 import { google } from 'googleapis';
+import authMiddleware from '../middleware/authMiddleware.js';
+import User from '../model/user.js';
+
 const router = express.Router();
 
 function createClient(tokens) {
@@ -13,19 +16,27 @@ function createClient(tokens) {
   return client;
 }
 
+router.use(authMiddleware);
+
 router.post('/create', async (req, res) => {
   try {
-    if (!req.session?.tokens) return res.status(401).json({ loginRequired: true });
+    const user = await User.findById(req.user.id);
+    if (!user || !user.googleTokens) {
+      return res.status(401).json({ loginRequired: true });
+    }
 
-    const { tokens } = req.session;
-    const oauth2Client = createClient(tokens);
+    const { googleTokens } = user;
+    const oauth2Client = createClient(googleTokens);
 
     // refresh / update tokens if needed
     const newToken = await oauth2Client.getAccessToken(); // refreshes automatically if refresh_token present
-    const accessToken = newToken?.token || oauth2Client.credentials.access_token || tokens.access_token;
+    const accessToken = newToken?.token || oauth2Client.credentials.access_token || googleTokens.access_token;
 
     // optionally update stored tokens if googleapis refreshed them
-    if (oauth2Client.credentials) req.session.tokens = { ...req.session.tokens, ...oauth2Client.credentials };
+    if (oauth2Client.credentials) {
+      user.googleTokens = { ...user.googleTokens, ...oauth2Client.credentials };
+      await user.save();
+    }
 
     const body = { displayName: req.body.title || 'Scheduled meeting' };
 
