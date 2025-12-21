@@ -1,210 +1,178 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom"; // Added useLocation
 import { useState } from "react";
 import api from "../api.js";
+import { 
+  Calendar, MessageSquare, Video, 
+  CheckCircle, ArrowLeft, Scissors, Send, PlusCircle, X 
+} from "lucide-react";
 
 const RequestDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [selectedSkill, setSelectedSkill] = useState("");
+  const location = useLocation(); // Initialize location
+  
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
-  const [request] = useState({
-    id,
-    username: "john_doe",
-    sender: "John Doe",
-    skill: "Python Tutoring",
-    date: "2025-10-23",
-    timeSlot: "2:00 PM - 4:00 PM",
-    day: "Saturday",
-    message:
-      "I'd like to learn Python basics this weekend. Specifically interested in data structures and basic algorithms. I have some programming experience but new to Python.",
+  // 1. Get the data from the navigation state, or fallback to your dummy data
+  const request = location.state?.request || {
+    studentName: "Keshvi Agarwal",
+    studentEmail: "keshviagarwal2004@gmail.com",
     status: "pending",
-  });
+    message: "Good to see you !!",
+    skillName: "Sewing", // Default skill name
+    selectedSlots: [
+      {
+        slotId: "6914f1458f106dabeed2639d",
+        day: "Thursday",
+        startTime: "8:00 PM",
+        endTime: "10:40 PM",
+      }
+    ]
+  };
 
-  const availableSkills = [
-    "Python Basics",
-    "Advanced Python",
-    "Data Science with Python",
-    "Web Development with Django",
-    "Automation with Python",
-  ];
+  // Use the skill from the passed request object, or fallback to Sewing
+  const selectedSkill = request.skillName || "Sewing";
 
   const handleCreateMeeting = async () => {
-    if (!selectedSkill) {
-      alert("Please select a skill to teach first!");
-      return;
-    }
-
     try {
-      const res = await api.post("/meet/create", {
-        title: `Teaching ${selectedSkill}`,
-      });
-
-      const meetLink = res.data.meetingLink;
-
-      alert("Meeting created successfully!");
-      window.open(meetLink, "_blank"); // 🔗 open Google Meet
-    } catch (err) {
-      console.error(err);
-      alert("Failed to create meeting. Please login again.");
+      const res = await api.post("/meet/create", { title: `Teaching ${selectedSkill}` });
+      window.open(res.data.meetingLink, "_blank");
+    } catch { 
+      alert("Login required again"); 
     }
-  };
-
-  const handleAccept = () => {
-    if (!selectedSkill) {
-      alert("Please select a skill to teach before accepting!");
-      return;
-    }
-    alert(`Request accepted! You'll be teaching ${selectedSkill}`);
-    navigate("/requests");
-  };
-
-  const handleStartChat = () => {
-    alert(`Opening chat with ${request.username}`);
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <button
-        className="flex items-center gap-2 text-blue-600 hover:text-blue-800 mb-6 transition-colors font-medium"
-        onClick={() => navigate("/requests")}
-      >
-        <svg
-          className="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M10 19l-7-7m0 0l7-7m-7 7h18"
-          />
-        </svg>
-        Back to Requests
-      </button>
+    <div className="min-h-screen bg-slate-950 p-6 flex items-center justify-center font-sans text-slate-200">
+      <div className="w-full max-w-5xl bg-slate-900 rounded-[2rem] shadow-2xl overflow-hidden border border-slate-800 flex flex-col md:flex-row min-h-[600px] max-h-[90vh] relative">
+        
+        {/* LEFT PANEL: Student Identity */}
+        <div className="md:w-1/3 bg-slate-800/40 p-8 flex flex-col justify-between border-r border-slate-800">
+          <div className="space-y-8">
+            <button 
+              onClick={() => navigate(-1)} 
+              className="flex items-center text-slate-400 hover:text-indigo-400 transition-colors text-sm group"
+            >
+              <ArrowLeft size={16} className="mr-2 group-hover:-translate-x-1 transition-transform" /> Back
+            </button>
 
-      <div className="bg-white shadow-xl rounded-2xl p-8 border border-gray-200">
-        {/* Header Section */}
-        <div className="flex justify-between items-start mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
-              {request.skill}
-            </h1>
-            <div className="flex items-center gap-4 text-gray-600">
-              <span className="font-semibold">{request.sender}</span>
-              <span className="text-gray-400">•</span>
-              <span>@{request.username}</span>
-              <span className="bg-yellow-100 text-yellow-800 text-sm font-medium px-3 py-1 rounded-full">
+            <div className="flex flex-col items-center md:items-start space-y-4">
+              <div className="h-20 w-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-[1.5rem] flex items-center justify-center shadow-xl ring-4 ring-slate-900/50">
+                <span className="text-2xl font-black text-white">
+                  {request.studentName?.charAt(0) || "S"}
+                </span>
+              </div>
+              <div className="text-center md:text-left">
+                <h2 className="text-2xl font-bold text-white tracking-tight">{request.studentName}</h2>
+                <p className="text-slate-500 text-sm mt-1">{request.studentEmail}</p>
+              </div>
+              <div className="inline-flex items-center px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-black uppercase tracking-[0.15em]">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 mr-2 animate-pulse" />
                 {request.status}
-              </span>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Time and Date Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 p-4 bg-blue-50 rounded-lg">
-          <div className="text-center">
-            <p className="text-sm font-semibold text-gray-600">Day</p>
-            <p className="text-lg font-bold text-gray-800">{request.day}</p>
-          </div>
-          <div className="text-center">
-            <p className="text-sm font-semibold text-gray-600">Date</p>
-            <p className="text-lg font-bold text-gray-800">{request.date}</p>
-          </div>
-          <div className="text-center">
-            <p className="text-sm font-semibold text-gray-600">Time Slot</p>
-            <p className="text-lg font-bold text-gray-800">
-              {request.timeSlot}
-            </p>
-          </div>
-        </div>
-
-        {/* Message Section */}
-        <div className="mb-8">
-          <h3 className="text-lg font-semibold text-gray-700 mb-3">
-            Message from {request.sender}
-          </h3>
-          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-            <p className="text-gray-700 leading-relaxed">{request.message}</p>
-          </div>
-        </div>
-
-        {/* Skill Selection Section */}
-        <div className="mb-8">
-          <h3 className="text-lg font-semibold text-gray-700 mb-4">
-            Select Skill You Want to Teach
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {availableSkills.map((skill, index) => (
-              <button
-                key={index}
-                onClick={() => setSelectedSkill(skill)}
-                className={`p-4 rounded-lg border-2 transition-all ${
-                  selectedSkill === skill
-                    ? "border-blue-500 bg-blue-50 text-blue-700"
-                    : "border-gray-200 bg-white text-gray-700 hover:border-blue-300"
-                }`}
+          <div className="space-y-3 mt-10">
+             <button 
+                onClick={() => setIsChatOpen(true)}
+                className="w-full flex items-center justify-center space-x-2 py-3 bg-slate-700/40 hover:bg-slate-700 text-white border border-slate-600/50 rounded-xl transition-all font-semibold"
               >
-                {skill}
-              </button>
-            ))}
-          </div>
-          {selectedSkill && (
-            <p className="mt-3 text-green-600 font-medium">
-              Selected: {selectedSkill}
-            </p>
-          )}
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-between items-center pt-6 border-t border-gray-200">
-          <button
-            onClick={handleStartChat}
-            className="flex items-center gap-3 bg-gray-100 text-gray-700 px-6 py-3 rounded-xl hover:bg-gray-200 transition-colors font-medium"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-              />
-            </svg>
-            Start Chat
-          </button>
-
-          <div className="flex gap-4">
-            <button
-              onClick={handleCreateMeeting}
-              disabled={!selectedSkill}
-              className={`px-8 py-3 rounded-xl font-semibold transition-colors ${
-                selectedSkill
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              }`}
-            >
-              Create Meeting
-            </button>
-
-            <button
-              onClick={handleAccept}
-              disabled={!selectedSkill}
-              className={`px-8 py-3 rounded-xl font-semibold transition-colors ${
-                selectedSkill
-                  ? "bg-green-600 text-white hover:bg-green-700"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              }`}
-            >
-              Accept Request
-            </button>
+                <MessageSquare size={18} />
+                <span>Open Chat</span>
+             </button>
+             <button 
+                onClick={() => navigate("/requests/new")}
+                className="w-full flex items-center justify-center space-x-2 py-3 bg-indigo-600 text-white hover:bg-indigo-500 rounded-xl transition-all font-semibold shadow-lg shadow-indigo-600/10"
+              >
+                <PlusCircle size={18} />
+                <span>New Request</span>
+             </button>
           </div>
         </div>
+
+        {/* RIGHT PANEL: Booking Details */}
+        <div className="flex-1 p-8 md:p-12 flex flex-col overflow-y-auto">
+          <div className="mb-10">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-400/80 mb-2">Selected Skill</h3>
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-indigo-500/10 text-indigo-400 rounded-2xl border border-indigo-500/20">
+                <Scissors size={24} />
+              </div>
+              <h1 className="text-3xl font-black text-white uppercase tracking-tight">{selectedSkill}</h1>
+            </div>
+          </div>
+
+          <div className="space-y-8 flex-1">
+            <section>
+              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-4">Availability</h3>
+              {request.selectedSlots?.length > 0 ? (
+                request.selectedSlots.map((slot, index) => (
+                  <div key={slot.slotId || index} className="flex items-center p-5 bg-slate-800/30 rounded-2xl border border-slate-700/50 group hover:border-indigo-500/30 transition-all duration-300">
+                    <div className="p-2 bg-slate-700/30 rounded-lg mr-4 text-slate-400 group-hover:text-indigo-400 transition-colors">
+                      <Calendar size={20} />
+                    </div>
+                    <div>
+                      <p className="font-bold text-white">{slot.day}</p>
+                      <p className="text-sm text-slate-400 font-medium">{slot.startTime} — {slot.endTime}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-slate-500 italic">No slots selected.</p>
+              )}
+            </section>
+
+            <section>
+              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-4">Message from Student</h3>
+              <div className="relative p-6 bg-slate-800/20 rounded-2xl border border-slate-800 group">
+                <div className="absolute left-0 top-6 bottom-6 w-1 bg-indigo-500 rounded-r-full" />
+                <p className="text-slate-300 text-lg italic leading-relaxed pl-2">
+                  "{request.message || "No message provided."}"
+                </p>
+              </div>
+            </section>
+          </div>
+
+          <div className="mt-10 pt-8 border-t border-slate-800 grid grid-cols-2 gap-4">
+            <button onClick={handleCreateMeeting} className="flex items-center justify-center space-x-2 py-4 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-2xl font-bold transition-all border border-slate-700">
+              <Video size={18} />
+              <span>Create Meet</span>
+            </button>
+            <button className="flex items-center justify-center space-x-2 py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold transition-all shadow-xl shadow-indigo-600/20">
+              <CheckCircle size={18} />
+              <span>Accept Request</span>
+            </button>
+          </div>
+        </div>
+
+        {/* OVERLAY CHAT DRAWER */}
+        {isChatOpen && (
+          <div className="absolute inset-0 z-50 flex justify-end bg-slate-950/60 backdrop-blur-sm transition-all duration-300">
+            <div className="w-full md:w-96 bg-slate-900 h-full shadow-2xl flex flex-col border-l border-slate-800 animate-in slide-in-from-right duration-300">
+              <div className="p-6 border-b border-slate-800 flex items-center justify-between">
+                <div>
+                    <h3 className="font-bold text-white text-lg">Chat</h3>
+                    <p className="text-[10px] text-indigo-400 font-bold uppercase tracking-widest">{request.studentName}</p>
+                </div>
+                <button onClick={() => setIsChatOpen(false)} className="p-2 hover:bg-slate-800 rounded-xl transition-colors">
+                  <X size={20} className="text-slate-400" />
+                </button>
+              </div>
+              <div className="flex-1 p-6 overflow-y-auto">
+                <div className="bg-slate-800 p-4 rounded-2xl rounded-tl-none text-sm text-slate-200 max-w-[85%] border border-slate-700/50">
+                  Hello! I'm interested in the {selectedSkill} class.
+                </div>
+              </div>
+              <div className="p-6 bg-slate-900 border-t border-slate-800">
+                <div className="flex items-center space-x-3">
+                  <input type="text" placeholder="Type a message..." className="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all" />
+                  <button className="p-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-500 shadow-lg shadow-indigo-600/20"><Send size={18} /></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
