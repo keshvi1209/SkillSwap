@@ -27,11 +27,8 @@ const userSchema = new mongoose.Schema(
       default: [],
     },
     googleTokens: {
-      access_token: String,
-      refresh_token: String,
-      scope: String,
-      token_type: String,
-      expiry_date: Number,
+      type: Object, 
+      default: {}
     },
     contact: { type: String, default: "" },
     address: { type: String, default: "" },

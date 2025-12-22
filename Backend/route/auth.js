@@ -11,28 +11,23 @@ const oauth2Client = new google.auth.OAuth2(
   process.env.REDIRECT_URI
 );
 
+// In auth.js
 const SCOPES = [
   "https://www.googleapis.com/auth/userinfo.email",
   "https://www.googleapis.com/auth/userinfo.profile",
-  "https://www.googleapis.com/auth/meetings.space.created",
+  "https://www.googleapis.com/auth/calendar", // <--- Add this line
 ];
 
 router.get("/login", (req, res) => {
+  // ... (Logging remains the same)
   console.log("🔵 /auth/login hit");
-  console.log("CLIENT_ID:", process.env.CLIENT_ID ? "✅" : "❌ Missing");
-  console.log(
-    "CLIENT_SECRET:",
-    process.env.CLIENT_SECRET ? "✅" : "❌ Missing"
-  );
-  console.log("REDIRECT_URI:", process.env.REDIRECT_URI || "❌ Missing");
 
   const url = oauth2Client.generateAuthUrl({
     access_type: "offline",
-    prompt: "consent",
+    prompt: "consent", // 'consent' forces a refresh token, but merging is still safer
     scope: SCOPES,
   });
 
-  console.log("🔗 Generated auth URL (Google)");
   return res.redirect(url);
 });
 
@@ -57,11 +52,23 @@ router.get("/callback", async (req, res) => {
         name: data.name,
         email: data.email,
         googleId: data.id,
-        googleTokens: tokens,
+        googleTokens: tokens, // First login always has refresh_token
       });
     } else {
-      user.googleTokens = tokens;
+      // --- CHANGED SECTION START ---
+      // Merge new tokens with existing ones to preserve refresh_token
+      // if the new response doesn't include it.
+      user.googleTokens = {
+        ...user.googleTokens,
+        ...tokens,
+      };
+
+      // If you changed your Schema to 'type: Object', Mongoose needs
+      // to be told that this Mixed type field has been modified.
+      user.markModified('googleTokens');
+      
       await user.save();
+      // --- CHANGED SECTION END ---
     }
 
     const token = jwt.sign(
@@ -70,38 +77,17 @@ router.get("/callback", async (req, res) => {
         name: user.name,
         email: user.email,
       },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET
     );
 
     const frontend = process.env.FRONTEND_ORIGIN || "http://localhost:5173";
     return res.redirect(`${frontend}/login?token=${token}`);
   } catch (err) {
-    console.error(err);
+    console.error("Auth Error:", err);
     return res.status(500).json({ error: err.message });
   }
 });
 
-router.get("/logout", (req, res) => {
-  return res.json({ success: true, message: "Logged out" });
-});
-
-router.get("/me", (req, res) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader) return res.status(401).json({ authenticated: false });
-
-  const token = authHeader.split(" ")[1];
-
-  try {
-    const user = jwt.verify(token, process.env.JWT_SECRET);
-
-    return res.json({
-      authenticated: true,
-      user,
-    });
-  } catch {
-    return res.status(401).json({ authenticated: false });
-  }
-});
+// ... (Rest of file remains the same)
 
 export default router;

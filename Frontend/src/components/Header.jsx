@@ -22,7 +22,7 @@ function Header() {
     "Home": "/",
     "Add Skills": "/app",
     "Received Requests": "/ReceivedRequests",
-    "Scheduled Meetings": "/meetings",
+    "Scheduled Meetings": "/schedule-calendar",
     "Chat": "/chat",
     "Past Sessions": "/sessions",
   };

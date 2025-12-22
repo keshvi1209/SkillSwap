@@ -5,8 +5,10 @@ export const canteachskills = async (req, res) => {
   try {
     const { 
       skill, experience, description, 
-      proficiency, mode, languages, tags, availability 
+      proficiency, mode, languages, tags
     } = req.body;
+
+    console.log("📝 Received canteachskills data:", req.body);
 
     const certificatePaths = req.files?.map(file => file.path) || [];
 
@@ -18,7 +20,6 @@ export const canteachskills = async (req, res) => {
       mode,
       languages: Array.isArray(languages) ? languages : [languages],
       tags: Array.isArray(tags) ? tags : [tags],
-      availability: JSON.parse(availability),
       certificates: certificatePaths,
     });
 

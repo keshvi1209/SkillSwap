@@ -1,55 +1,115 @@
 import express from 'express';
-import axios from 'axios';
 import { google } from 'googleapis';
 import authMiddleware from '../middleware/authMiddleware.js';
 import User from '../model/user.js';
+import Meeting from '../model/meeting.js'; // 1. IMPORT THE MEETING MODEL
 
 const router = express.Router();
 
-function createClient(tokens) {
-  const client = new google.auth.OAuth2(
-    process.env.CLIENT_ID,
-    process.env.CLIENT_SECRET,
-    process.env.REDIRECT_URI
-  );
-  client.setCredentials(tokens);
-  return client;
-}
-
 router.use(authMiddleware);
 
-router.post('/create', async (req, res) => {
+// --- ROUTE 1: Schedule Logic (Google + MongoDB) ---
+router.post('/schedule', async (req, res) => {
   try {
+    // 2. EXTRACT NEW FIELDS: studentId and skillName are needed for MongoDB
+    const { summary, description, startTime, endTime, studentEmail, studentId, skillName } = req.body;
+    
+    // Fetch User & Tokens
     const user = await User.findById(req.user.id);
     if (!user || !user.googleTokens) {
       return res.status(401).json({ loginRequired: true });
     }
 
-    const { googleTokens } = user;
-    const oauth2Client = createClient(googleTokens);
+    const oauth2Client = new google.auth.OAuth2(
+      process.env.CLIENT_ID,
+      process.env.CLIENT_SECRET,
+      process.env.REDIRECT_URI
+    );
+    oauth2Client.setCredentials(user.googleTokens);
 
-    // refresh / update tokens if needed
-    const newToken = await oauth2Client.getAccessToken(); // refreshes automatically if refresh_token present
-    const accessToken = newToken?.token || oauth2Client.credentials.access_token || googleTokens.access_token;
+    const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
-    // optionally update stored tokens if googleapis refreshed them
-    if (oauth2Client.credentials) {
-      user.googleTokens = { ...user.googleTokens, ...oauth2Client.credentials };
-      await user.save();
-    }
+    // Define the Event
+    const event = {
+      summary: summary || 'Class Session',
+      description: description || 'Scheduled via Platform',
+      start: {
+        dateTime: startTime, 
+        timeZone: 'Asia/Kolkata', 
+      },
+      end: {
+        dateTime: endTime,
+        timeZone: 'Asia/Kolkata',
+      },
+      attendees: [
+        { email: studentEmail },
+      ],
+      conferenceData: {
+        createRequest: {
+          requestId: Math.random().toString(36).substring(7),
+          conferenceSolutionKey: { type: 'hangoutsMeet' },
+        },
+      },
+    };
 
-    const body = { displayName: req.body.title || 'Scheduled meeting' };
-
-    const response = await axios.post('https://meet.googleapis.com/v2/spaces', body, {
-      headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' }
+    // Insert Event into Google Calendar
+    const response = await calendar.events.insert({
+      calendarId: 'primary',
+      resource: event,
+      conferenceDataVersion: 1, 
+      sendUpdates: 'all', 
     });
 
-    const meetingLink = response.data?.meetingUri || null;
-    return res.json({ meetingLink, raw: response.data });
+    console.log('✅ Google Event Created:', response.data.htmlLink);
+
+    // 3. SAVE TO MONGODB
+    // This allows you to show the schedule in your own React app
+    const newMeeting = await Meeting.create({
+      teacherId: req.user.id, // The logged-in user is the teacher
+      studentId: studentId,   // Passed from frontend
+      skillName: skillName || 'Class',
+      startTime: startTime,
+      endTime: endTime,
+      meetLink: response.data.hangoutLink,
+      googleEventId: response.data.id
+    });
+
+    console.log('✅ MongoDB Meeting Saved:', newMeeting._id);
+
+    return res.json({ 
+      success: true,
+      meetLink: response.data.hangoutLink, 
+      calendarLink: response.data.htmlLink,
+      meetingId: newMeeting._id
+    });
+
   } catch (err) {
-    console.error('Create meeting error', err.response?.data || err.message || err);
-    if (err.response?.status === 401) return res.status(401).json({ loginRequired: true });
-    return res.status(500).json({ error: 'Failed to create meeting' });
+    console.error('❌ Calendar Schedule Error:', err);
+    if (err.code === 401) return res.status(401).json({ loginRequired: true });
+    return res.status(500).json({ error: 'Failed to schedule meeting' });
+  }
+});
+
+// --- ROUTE 2: Fetch Calendar Data (For React UI) ---
+router.get('/my-calendar', async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Find meetings where I am EITHER the teacher OR the student
+    const meetings = await Meeting.find({
+      $or: [
+        { teacherId: userId },
+        { studentId: userId }
+      ]
+    })
+    .populate('teacherId', 'name email') // Get details to display "Taught by X"
+    .populate('studentId', 'name email') // Get details to display "Student: Y"
+    .sort({ startTime: 1 }); // Sort by earliest first
+
+    return res.json(meetings);
+  } catch (err) {
+    console.error('❌ Fetch Calendar Error:', err);
+    return res.status(500).json({ error: "Failed to fetch calendar" });
   }
 });
 

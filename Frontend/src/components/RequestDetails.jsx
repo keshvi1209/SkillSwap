@@ -1,25 +1,25 @@
-import { useParams, useNavigate, useLocation } from "react-router-dom"; // Added useLocation
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import api from "../api.js";
 import { 
   Calendar, MessageSquare, Video, 
-  CheckCircle, ArrowLeft, Scissors, Send, PlusCircle, X 
+  CheckCircle, ArrowLeft, Scissors, Send, PlusCircle, X, Loader2 
 } from "lucide-react";
 
 const RequestDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const location = useLocation(); // Initialize location
+  const location = useLocation();
   
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isScheduling, setIsScheduling] = useState(false); // New loading state
 
-  // 1. Get the data from the navigation state, or fallback to your dummy data
   const request = location.state?.request || {
     studentName: "Keshvi Agarwal",
     studentEmail: "keshviagarwal2004@gmail.com",
     status: "pending",
     message: "Good to see you !!",
-    skillName: "Sewing", // Default skill name
+    skillName: "Sewing",
     selectedSlots: [
       {
         slotId: "6914f1458f106dabeed2639d",
@@ -30,27 +30,80 @@ const RequestDetails = () => {
     ]
   };
 
-  // Use the skill from the passed request object, or fallback to Sewing
   const selectedSkill = request.skillName || "Sewing";
-
   const userId = localStorage.getItem("id");
 
-  const handleCreateMeeting = async () => {
+  // --- HELPER: Convert "Thursday" + "8:00 PM" to actual JS Date ---
+  const getNextDate = (dayName, timeString) => {
+    const days = { Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6 };
+    const targetDay = days[dayName];
+    if (targetDay === undefined) return null;
+
+    const date = new Date();
+    const currentDay = date.getDay();
+    
+    // Calculate days until next occurrence (0 means today, 7 means next week if today is same day)
+    let daysUntil = (targetDay + 7 - currentDay) % 7;
+    if (daysUntil === 0) daysUntil = 0; // Or 7 if you always want next week
+
+    date.setDate(date.getDate() + daysUntil);
+
+    // Parse Time (e.g., "8:00 PM")
+    const [time, modifier] = timeString.split(' ');
+    let [hours, minutes] = time.split(':');
+    
+    if (hours === '12') hours = '00';
+    if (modifier === 'PM') hours = parseInt(hours, 10) + 12;
+    
+    date.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+    return date;
+  };
+
+  const handleScheduleMeeting = async () => {
+    // 1. Validation
+    if (!request.selectedSlots || request.selectedSlots.length === 0) {
+      alert("No time slot available to schedule.");
+      return;
+    }
+
+    // Default to the first slot for now
+    const slot = request.selectedSlots[0];
+    const startDate = getNextDate(slot.day, slot.startTime);
+    const endDate = getNextDate(slot.day, slot.endTime);
+
+    if (!startDate || !endDate) {
+      alert("Could not parse date/time.");
+      return;
+    }
+
+    setIsScheduling(true);
+
     try {
-      const res = await api.post("/meet/create", {
-        requestId: userId,
+      // 2. Call the new Schedule API
+      const res = await api.post("/meet/schedule", {
+        summary: `Class: ${selectedSkill} with ${request.studentName}`,
+        description: request.message,
+        startTime: startDate.toISOString(),
+        endTime: endDate.toISOString(),
+        studentEmail: request.studentEmail,
+        studentId: request.studentId, // Ensure your 'request' object has this!
+        skillName: selectedSkill
       });
-      window.open(res.data.meetingLink, "_blank");
-    } catch (error) {
-      console.error("Meeting Creation Failed:", error.response?.data || error.message);
+
+      // 3. Success Feedback
+      alert(`✅ Meeting Scheduled! \n\nCheck your scheduled meetings.\nLink: ${res.data.meetLink}`);
+      console.log("Meet Link:", res.data.meetLink);
       
-      // Only alert Login Required if it is actually a 401
+    } catch (error) {
+      console.error("Scheduling Failed:", error.response?.data || error.message);
+      
       if (error.response?.status === 401) {
-         alert("Your Google session expired. Please login again.");
-         // Optionally redirect to login here
+        alert("🔒 Google Login Required.\n\nPlease log out and log in again to grant Calendar permissions.");
       } else {
-         alert("Failed to create meeting. Check console for details.");
+        alert("Failed to schedule meeting. Check console.");
       }
+    } finally {
+      setIsScheduling(false);
     }
   };
 
@@ -147,9 +200,22 @@ const RequestDetails = () => {
           </div>
 
           <div className="mt-10 pt-8 border-t border-slate-800 grid grid-cols-2 gap-4">
-            <button onClick={handleCreateMeeting} className="flex items-center justify-center space-x-2 py-4 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-2xl font-bold transition-all border border-slate-700">
-              <Video size={18} />
-              <span>Create Meet</span>
+            <button 
+              onClick={handleScheduleMeeting} 
+              disabled={isScheduling}
+              className="flex items-center justify-center space-x-2 py-4 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-2xl font-bold transition-all border border-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isScheduling ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" />
+                  <span>Scheduling...</span>
+                </>
+              ) : (
+                <>
+                  <Video size={18} />
+                  <span>Schedule Class</span>
+                </>
+              )}
             </button>
             <button className="flex items-center justify-center space-x-2 py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold transition-all shadow-xl shadow-indigo-600/20">
               <CheckCircle size={18} />

@@ -18,6 +18,7 @@ import UserDetail from "./pages/UserDetail.jsx";
 import RequestDetails from "./components/RequestDetails.jsx";
 import ReceivedRequests from "./components/ReceivedRequests.jsx";
 import AvailabilityPage from "./pages/AvailabilityPage.jsx";
+import ScheduleCalendar from "./components/ScheduleCalendar.jsx";
 
 function AuthInitializer({ children }) {
   const { setUser } = useAuth();
@@ -64,6 +65,7 @@ createRoot(document.getElementById("root")).render(
             <Route path="/RequestDetails" element={<RequestDetails />} />
             <Route path="/ReceivedRequests" element={<ReceivedRequests />} />
             <Route path="/availability" element={<AvailabilityPage />} />
+            <Route path="/schedule-calendar" element={<ScheduleCalendar />} />
           </Routes>
         </AuthInitializer>
       </AuthProvider>
