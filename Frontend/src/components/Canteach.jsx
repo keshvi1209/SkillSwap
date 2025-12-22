@@ -98,6 +98,7 @@ function Canteach() {
       const response = await api.post("/canteachskills", data, {
         headers: {
           'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${localStorage.getItem("token")}`
         }
       });
 

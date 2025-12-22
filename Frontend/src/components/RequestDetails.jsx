@@ -33,12 +33,24 @@ const RequestDetails = () => {
   // Use the skill from the passed request object, or fallback to Sewing
   const selectedSkill = request.skillName || "Sewing";
 
+  const userId = localStorage.getItem("id");
+
   const handleCreateMeeting = async () => {
     try {
-      const res = await api.post("/meet/create", { title: `Teaching ${selectedSkill}` });
+      const res = await api.post("/meet/create", {
+        requestId: userId,
+      });
       window.open(res.data.meetingLink, "_blank");
-    } catch { 
-      alert("Login required again"); 
+    } catch (error) {
+      console.error("Meeting Creation Failed:", error.response?.data || error.message);
+      
+      // Only alert Login Required if it is actually a 401
+      if (error.response?.status === 401) {
+         alert("Your Google session expired. Please login again.");
+         // Optionally redirect to login here
+      } else {
+         alert("Failed to create meeting. Check console for details.");
+      }
     }
   };
 
