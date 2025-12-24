@@ -62,7 +62,7 @@ createRoot(document.getElementById("root")).render(
             <Route path="/learn" element={<LearnSkillsPage />} />
             <Route path="/app" element={<App />} />
             <Route path="/userdetail" element={<UserDetail />} />
-            <Route path="/RequestDetails" element={<RequestDetails />} />
+            <Route path="/RequestDetails/:id" element={<RequestDetails />} />
             <Route path="/ReceivedRequests" element={<ReceivedRequests />} />
             <Route path="/availability" element={<AvailabilityPage />} />
             <Route path="/schedule-calendar" element={<ScheduleCalendar />} />

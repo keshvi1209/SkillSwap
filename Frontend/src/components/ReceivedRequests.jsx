@@ -56,7 +56,7 @@ const ReceivedRequests = () => {
   );
 
   const handleViewDetails = (req) => {
-    navigate("/RequestDetails", { state: { request: req } });
+    navigate(`/RequestDetails/${req._id}`, { state: { request: req } });
   };
 
   const getStatusColor = (status) => {
