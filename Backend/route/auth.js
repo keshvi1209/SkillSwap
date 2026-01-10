@@ -1,7 +1,7 @@
 import express from "express";
 import { google } from "googleapis";
 import jwt from "jsonwebtoken";
-import User from "../model/user.js";
+import User from "../model/user/user.js";
 
 const router = express.Router();
 
@@ -66,7 +66,7 @@ router.get("/callback", async (req, res) => {
       // If you changed your Schema to 'type: Object', Mongoose needs
       // to be told that this Mixed type field has been modified.
       user.markModified('googleTokens');
-      
+
       await user.save();
       // --- CHANGED SECTION END ---
     }

@@ -6,11 +6,11 @@ import {
   Navigate,
   useNavigate,
 } from "react-router-dom";
-import Header from "./components/Header";
-import SkillsEntry from "./pages/SkillsEntry";
-import AvailabilityPage from "./pages/AvailabilityPage";
+import Header from "./components/layout/Header";
+import SkillsEntry from "./pages/skills/SkillsEntry";
+import AvailabilityPage from "./pages/profile/AvailabilityPage";
 import { motion } from "framer-motion";
-import Welcomesection from "./components/Welcomesection";
+import Welcomesection from "./components/skills/Welcomesection";
 import { useAuth } from "./context/AuthContext";
 
 function App() {
@@ -52,10 +52,9 @@ function App() {
               onClick={handleNavigate}
               disabled={availabilityset}
               className={`px-8 py-4 font-semibold rounded-xl transition-all duration-200 text-lg 
-                ${
-                  availabilityset
-                    ? "bg-gray-500 text-gray-300 cursor-not-allowed"
-                    : "bg-gradient-to-r from-[#6C63FF] to-[#4a3fdb] text-white hover:shadow-lg hover:shadow-purple-500/25 hover:-translate-y-0.5 focus:ring-2 focus:ring-[#6C63FF] focus:ring-offset-2 focus:ring-offset-[#1a1a2e]"
+                ${availabilityset
+                  ? "bg-gray-500 text-gray-300 cursor-not-allowed"
+                  : "bg-gradient-to-r from-[#6C63FF] to-[#4a3fdb] text-white hover:shadow-lg hover:shadow-purple-500/25 hover:-translate-y-0.5 focus:ring-2 focus:ring-[#6C63FF] focus:ring-offset-2 focus:ring-offset-[#1a1a2e]"
                 }`}
             >
               {availabilityset ? "Availability Already Set" : "Set Your Availability"}

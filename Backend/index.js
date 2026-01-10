@@ -2,32 +2,33 @@ import express from "express";
 import cors from "cors";
 import session from "express-session";
 import dotenv from "dotenv";
-import connectdb from "./model/connectdb.js";
+import connectdb from "./config/connectdb.js";
 import routes from "./route/route.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import authRoutes from "./route/auth.js";
 import meetRoutes from "./route/meet.js";
 
-// --- 1. NEW IMPORTS FOR SOCKET.IO ---
+// --- 1. SOCKET.IO IMPORTS ---
 import { createServer } from "http";
 import { Server } from "socket.io";
-import Message from "./model/Message.js"; // Ensure you created this file!
+import Message from "./model/chat/Message.js"; // Ensure this model exists
 
 dotenv.config();
 connectdb();
 
 const app = express();
 
-// --- 2. WRAP EXPRESS APP IN HTTP SERVER ---
+// --- 2. CREATE HTTP SERVER ---
 const httpServer = createServer(app);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Centralized Allowed Origins
 const allowedOrigins = [
-  "https://skill-swap-jet-one.vercel.app", 
-  "http://localhost:5173", 
+  "https://skill-swap-jet-one.vercel.app",
+  "http://localhost:5173",
 ];
 
 app.use(express.json());
@@ -51,7 +52,7 @@ app.use(
 // --- 3. SOCKET.IO SETUP ---
 const io = new Server(httpServer, {
   cors: {
-    origin: allowedOrigins, // Reuse your allowed origins
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -63,10 +64,10 @@ app.use(
     resave: false,
     saveUninitialized: true,
     cookie: {
-      secure: false, // set to true in production with HTTPS
+      secure: process.env.NODE_ENV === "production", // True in production
       httpOnly: true,
-      sameSite: "lax",
-      maxAge: 24 * 60 * 60 * 1000, 
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000,
     },
   })
 );
@@ -76,11 +77,11 @@ app.use("/auth", authRoutes);
 app.use("/", routes);
 app.use("/meet", meetRoutes);
 
-// --- 4. NEW: CHAT HISTORY ROUTE ---
+// --- 4. CHAT HISTORY ROUTE ---
 app.get("/chats/:roomId", async (req, res) => {
   try {
     const { roomId } = req.params;
-    // Fetch messages for this room, sorted by time (oldest first)
+    // Fetch messages sorted by creation time (Oldest -> Newest)
     const messages = await Message.find({ roomId }).sort({ createdAt: 1 });
     res.status(200).json(messages);
   } catch (err) {
@@ -89,35 +90,33 @@ app.get("/chats/:roomId", async (req, res) => {
   }
 });
 
-// --- 5. NEW: SOCKET.IO LOGIC ---
+// --- 5. SOCKET.IO LOGIC ---
 io.on("connection", (socket) => {
   console.log(`Socket Connected: ${socket.id}`);
 
-  // Join a specific Request ID room
   socket.on("join_room", (room) => {
     socket.join(room);
     console.log(`User ${socket.id} joined room: ${room}`);
   });
 
-  // Handle sending messages
   socket.on("send_message", async (data) => {
-    // data = { room, authorId, authorName, message, time }
-    
-    // 1. Broadcast to everyone else in the room
+    // Broadcast to everyone in the room EXCEPT the sender
     socket.to(data.room).emit("receive_message", data);
 
-    // 2. Save to Database
-    try {
-      const newMessage = new Message({
-        roomId: data.room,
-        authorId: data.authorId,
-        authorName: data.authorName,
-        message: data.message,
-        time: data.time,
-      });
-      await newMessage.save();
-    } catch (err) {
-      console.error("Error saving message to DB:", err);
+    // Save to Database
+    if (data.authorId) {
+      try {
+        const newMessage = new Message({
+          roomId: data.room,
+          authorId: data.authorId,
+          authorName: data.authorName,
+          message: data.message,
+          time: data.time,
+        });
+        await newMessage.save();
+      } catch (err) {
+        console.error("Error saving message to DB:", err);
+      }
     }
   });
 
@@ -128,7 +127,7 @@ io.on("connection", (socket) => {
 
 const PORT = process.env.PORT || 5000;
 
-// --- 6. IMPORTANT: CHANGE 'app.listen' TO 'httpServer.listen' ---
+// --- 6. LISTEN WITH HTTPSERVER ---
 httpServer.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

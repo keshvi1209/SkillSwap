@@ -1,8 +1,8 @@
 import express from 'express';
 import { google } from 'googleapis';
 import authMiddleware from '../middleware/authMiddleware.js';
-import User from '../model/user.js';
-import Meeting from '../model/meeting.js'; // 1. IMPORT THE MEETING MODEL
+import User from "../model/user/user.js";
+import Meeting from "../model/booking/meeting.js"; // 1. IMPORT THE MEETING MODEL
 
 const router = express.Router();
 
@@ -13,7 +13,7 @@ router.post('/schedule', async (req, res) => {
   try {
     // 2. EXTRACT NEW FIELDS: studentId and skillName are needed for MongoDB
     const { summary, description, startTime, endTime, studentEmail, studentId, skillName } = req.body;
-    
+
     // Fetch User & Tokens
     const user = await User.findById(req.user.id);
     if (!user || !user.googleTokens) {
@@ -34,8 +34,8 @@ router.post('/schedule', async (req, res) => {
       summary: summary || 'Class Session',
       description: description || 'Scheduled via Platform',
       start: {
-        dateTime: startTime, 
-        timeZone: 'Asia/Kolkata', 
+        dateTime: startTime,
+        timeZone: 'Asia/Kolkata',
       },
       end: {
         dateTime: endTime,
@@ -56,8 +56,8 @@ router.post('/schedule', async (req, res) => {
     const response = await calendar.events.insert({
       calendarId: 'primary',
       resource: event,
-      conferenceDataVersion: 1, 
-      sendUpdates: 'all', 
+      conferenceDataVersion: 1,
+      sendUpdates: 'all',
     });
 
     console.log('✅ Google Event Created:', response.data.htmlLink);
@@ -76,9 +76,9 @@ router.post('/schedule', async (req, res) => {
 
     console.log('✅ MongoDB Meeting Saved:', newMeeting._id);
 
-    return res.json({ 
+    return res.json({
       success: true,
-      meetLink: response.data.hangoutLink, 
+      meetLink: response.data.hangoutLink,
       calendarLink: response.data.htmlLink,
       meetingId: newMeeting._id
     });
@@ -102,9 +102,9 @@ router.get('/my-calendar', async (req, res) => {
         { studentId: userId }
       ]
     })
-    .populate('teacherId', 'name email') // Get details to display "Taught by X"
-    .populate('studentId', 'name email') // Get details to display "Student: Y"
-    .sort({ startTime: 1 }); // Sort by earliest first
+      .populate('teacherId', 'name email') // Get details to display "Taught by X"
+      .populate('studentId', 'name email') // Get details to display "Student: Y"
+      .sort({ startTime: 1 }); // Sort by earliest first
 
     return res.json(meetings);
   } catch (err) {

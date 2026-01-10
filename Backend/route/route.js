@@ -1,23 +1,23 @@
 import { Router } from "express";
-import { signup, login } from "../control/userController.js";
-import { canteachskills } from "../control/canteachskillsController.js";
-import { tolearnskills } from "../control/tolearnskillsController.js";
+import { signup, login } from "../control/auth/userController.js";
+import { canteachskills } from "../control/skills/canteachskillsController.js";
+import { tolearnskills } from "../control/skills/tolearnskillsController.js";
 import multer from "multer";
 import authMiddleware from "../middleware/authMiddleware.js";
-import { getCanTeachSkills,getToLearnSkills } from "../control/getSkillsController.js";
-import { getcanteachbyid, putcanteachbyid } from "../control/editSkillsController.js";
-import { setCanTeachPreferences, setToLearnPreferences } from "../control/SetPreferencesController.js";
-import recommendations from "../control/recommendationController.js";
-import {getDetails,getusercompletedetails} from "../control/getDetailsController.js";
-import { getupdateddetails,updatedetails } from "../control/basicDetailsController.js";
-import { saveAvailability , getAvailability } from "../control/availabilityController.js";
+import { getCanTeachSkills, getToLearnSkills } from "../control/skills/getSkillsController.js";
+import { getcanteachbyid, putcanteachbyid } from "../control/skills/editSkillsController.js";
+import { setCanTeachPreferences, setToLearnPreferences } from "../control/skills/SetPreferencesController.js";
+import recommendations from "../control/recommendation/recommendationController.js";
+import { getDetails, getusercompletedetails } from "../control/profile/getDetailsController.js";
+import { getupdateddetails, updatedetails } from "../control/profile/basicDetailsController.js";
+import { saveAvailability, getAvailability } from "../control/booking/availabilityController.js";
 import {
   createBooking,
-} from "../control/bookingController.js";
+} from "../control/booking/bookingController.js";
 import {
   getReceivedRequests,
   updateBookingStatus,
-} from "../control/handlebookingrequest.js";
+} from "../control/booking/handlebookingrequest.js";
 
 const router = Router();
 
