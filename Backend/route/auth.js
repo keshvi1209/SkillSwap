@@ -80,7 +80,7 @@ router.get("/callback", async (req, res) => {
       process.env.JWT_SECRET
     );
 
-    const frontend = process.env.FRONTEND_ORIGIN || "http://localhost:5173";
+    const frontend = process.env.FRONTEND_ORIGIN ;
     return res.redirect(`${frontend}/login?token=${token}`);
   } catch (err) {
     console.error("Auth Error:", err);
