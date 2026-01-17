@@ -32,6 +32,7 @@ const RequestDetails = () => {
   // --- STATES ---
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isScheduling, setIsScheduling] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
 
   // Chat States
   const [messages, setMessages] = useState([]);
@@ -63,9 +64,20 @@ const RequestDetails = () => {
       setMessages((prev) => [...prev, data]);
     });
 
-    // 4. Listen for Connection Errors
+    // 4. Listen for Connection Events
+    socketRef.current.on("connect", () => {
+      console.log("✅ Socket Connected:", socketRef.current.id);
+      setIsConnected(true);
+    });
+
+    socketRef.current.on("disconnect", () => {
+      console.log("❌ Socket Disconnected");
+      setIsConnected(false);
+    });
+
     socketRef.current.on("connect_error", (err) => {
-      console.error("Socket Connection Error:", err);
+      console.error("⚠️ Socket Connection Error:", err);
+      setIsConnected(false);
     });
 
     // 5. FETCH HISTORY FROM DB (Crucial Step)
@@ -297,7 +309,16 @@ const RequestDetails = () => {
               {/* Chat Header */}
               <div className="p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/95 backdrop-blur">
                 <div>
-                  <h3 className="font-bold text-white text-lg">Chat</h3>
+                  <h3 className="font-bold text-white text-lg flex items-center gap-2">
+                    Chat
+                    <span
+                      className={`w-2 h-2 rounded-full ${isConnected
+                        ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"
+                        : "bg-red-500"
+                        }`}
+                      title={isConnected ? "Connected" : "Disconnected"}
+                    />
+                  </h3>
                   <p className="text-[10px] text-indigo-400 font-bold uppercase tracking-widest">
                     {request.studentName}
                   </p>

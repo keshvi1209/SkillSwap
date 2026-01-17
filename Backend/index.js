@@ -8,12 +8,12 @@ import path from "path";
 import { fileURLToPath } from "url";
 import authRoutes from "./route/auth.js";
 import meetRoutes from "./route/meet.js";
+import socketHandler from "./socket/socket.js";
 
-// --- 1. SOCKET.IO IMPORTS ---
+
 import { createServer } from "http";
 import { Server } from "socket.io";
-import Message from "./model/chat/Message.js"; // Ensure this model exists
-
+import Message from "./model/chat/Message.js"; 
 dotenv.config();
 connectdb();
 
@@ -91,40 +91,7 @@ app.get("/chats/:roomId", async (req, res) => {
 });
 
 // --- 5. SOCKET.IO LOGIC ---
-io.on("connection", (socket) => {
-  console.log(`Socket Connected: ${socket.id}`);
-
-  socket.on("join_room", (room) => {
-    socket.join(room);
-    console.log(`User ${socket.id} joined room: ${room}`);
-  });
-
-  socket.on("send_message", async (data) => {
-    // Broadcast to everyone in the room EXCEPT the sender
-    socket.to(data.room).emit("receive_message", data);
-
-    // Save to Database
-    if (data.authorId) {
-      try {
-        const newMessage = new Message({
-          roomId: data.room,
-          authorId: data.authorId,
-          authorName: data.authorName,
-          message: data.message,
-          time: data.time,
-        });
-        await newMessage.save();
-      } catch (err) {
-        console.error("Error saving message to DB:", err);
-      }
-    }
-  });
-
-  socket.on("disconnect", () => {
-    console.log("Socket Disconnected", socket.id);
-  });
-});
-
+socketHandler(io);
 const PORT = process.env.PORT || 5000;
 
 // --- 6. LISTEN WITH HTTPSERVER ---
