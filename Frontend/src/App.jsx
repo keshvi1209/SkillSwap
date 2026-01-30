@@ -1,16 +1,9 @@
 import React, { useState } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-  useNavigate,
-} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { CalendarCheck, Sparkles } from "lucide-react";
 import Header from "./components/layout/Header";
 import SkillsEntry from "./pages/skills/SkillsEntry";
-import AvailabilityPage from "./pages/profile/AvailabilityPage";
-import { motion } from "framer-motion";
-import Welcomesection from "./components/skills/Welcomesection";
 import { useAuth } from "./context/AuthContext";
 
 function App() {
@@ -22,49 +15,67 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460]">
-      {/* Background visuals */}
-      <div className="fixed inset-0 overflow-hidden">
-        <div className="absolute top-[10%] left-[5%] w-72 h-72 bg-gradient-to-br from-purple-500/15 to-indigo-700/15 rounded-full blur-xl animate-pulse-slow"></div>
-        <div className="absolute bottom-[15%] right-[10%] w-48 h-48 bg-gradient-to-br from-purple-500/12 to-indigo-700/12 rounded-full blur-lg animate-float"></div>
-        <div className="absolute top-1/2 left-[70%] w-36 h-36 bg-gradient-to-br from-purple-500/10 to-indigo-700/10 rounded-full blur-md animate-rotate"></div>
-        <div className="absolute bottom-[5%] left-[20%] w-60 h-60 bg-gradient-to-br from-purple-500/12 to-indigo-700/12 rounded-full blur-lg animate-pulse-slow delay-1000"></div>
+    <div className="min-h-screen bg-gray-950 relative overflow-x-hidden selection:bg-indigo-500/30 font-sans text-gray-200">
+
+      {/* Ambient Background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[120px] animate-pulse-slow" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[120px] animate-pulse-slow delay-1000" />
       </div>
 
       <Header />
 
-      <Welcomesection>
-        <h2 className="text-xl md:text-2xl text-gray-300 text-center leading-relaxed relative z-10">
-          Ready to elevate your skills or share your expertise?
-          <br />
-          Let's get your skill listed!
-        </h2>
-      </Welcomesection>
+      <main className="relative z-10 pt-12 pb-20 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
 
-      <div className="container mx-auto px-4 pt-4 relative z-10">
-        <div className="flex justify-center mb-3">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
+        {/* Hero Text */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-12 max-w-3xl"
+        >
+         
+
+          <h1 className="text-3xl md:text-5xl font-extrabold text-white mb-6 tracking-tight leading-tight">
+            Ready to <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Elevate Skills</span> or <br className="hidden md:block" /> Share Expertise?
+          </h1>
+
+        </motion.div>
+
+        {/* Availability Action Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.6 }}
+          className="w-full max-w-4xl mb-10"
+        >
+          <div className="bg-gray-900/40 backdrop-blur-md border border-white/10 rounded-3xl p-6 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-indigo-500/20 rounded-2xl text-indigo-400">
+                <CalendarCheck size={32} />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white">Manage Availability</h3>
+                <p className="text-gray-400 text-sm">Set your schedule to receive booking requests.</p>
+              </div>
+            </div>
+
             <button
               onClick={handleNavigate}
               disabled={availabilityset}
-              className={`px-8 py-4 font-semibold rounded-xl transition-all duration-200 text-lg 
-                ${availabilityset
-                  ? "bg-gray-500 text-gray-300 cursor-not-allowed"
-                  : "bg-gradient-to-r from-[#6C63FF] to-[#4a3fdb] text-white hover:shadow-lg hover:shadow-purple-500/25 hover:-translate-y-0.5 focus:ring-2 focus:ring-[#6C63FF] focus:ring-offset-2 focus:ring-offset-[#1a1a2e]"
+              className={`px-8 py-3.5 rounded-xl font-semibold text-white transition-all duration-300 shadow-lg ${availabilityset
+                  ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                  : "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 hover:shadow-indigo-500/25 hover:-translate-y-0.5"
                 }`}
             >
-              {availabilityset ? "Availability Already Set" : "Set Your Availability"}
+              {availabilityset ? "Availability Set" : "Set Availability"}
             </button>
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
 
-      </div>
-
-      <SkillsEntry />
+        {/* Skills Entry Form */}
+        <SkillsEntry />
+      </main>
     </div>
   );
 }

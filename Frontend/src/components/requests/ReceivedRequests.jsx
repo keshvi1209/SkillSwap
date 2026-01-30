@@ -1,7 +1,19 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  User,
+  Calendar,
+  Clock,
+  ArrowRight,
+  Filter,
+  AlertCircle,
+  Inbox,
+  BookOpen
+} from "lucide-react";
 import api from "../../services/api";
+import Header from "../layout/Header";
 
 const ReceivedRequests = () => {
   const navigate = useNavigate();
@@ -62,38 +74,38 @@ const ReceivedRequests = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case "pending":
-        return "text-amber-400 bg-amber-400/10 border-amber-400/20";
+        return "text-amber-400 bg-amber-500/10 border-amber-500/20";
       case "accepted":
-        return "text-emerald-400 bg-emerald-400/10 border-emerald-400/20";
+        return "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
       case "rejected":
-        return "text-rose-400 bg-rose-400/10 border-rose-400/20";
+        return "text-rose-400 bg-rose-500/10 border-rose-500/20";
       default:
-        return "text-gray-400 bg-gray-400/10 border-gray-400/20";
+        return "text-gray-400 bg-gray-500/10 border-gray-500/20";
     }
-  };
-
-  const getAvatarGradient = (name) => {
-    const gradients = [
-      "from-pink-500 to-rose-500",
-      "from-purple-500 to-indigo-500",
-      "from-cyan-500 to-blue-500",
-      "from-emerald-500 to-teal-500",
-    ];
-    return gradients[name ? name.length % gradients.length : 0];
   };
 
   if (loading) return <LoadingState />;
   if (error) return <ErrorState error={error} />;
 
   return (
-    <div className="min-h-screen bg-black text-gray-200">
-      <div className="max-w-6xl mx-auto px-4 py-12">
-        {/* Header */}
-        <div className="flex justify-between items-end mb-10">
+    <div className="min-h-screen bg-gray-950 relative overflow-x-hidden selection:bg-indigo-500/30 font-sans text-gray-200">
+
+      {/* Ambient Background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[120px]" />
+      </div>
+
+      <Header />
+
+      <main className="relative z-10 pt-8 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        {/* Page Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
-            <h1 className="text-4xl font-bold text-white">Dashboard</h1>
-            <p className="text-gray-500">
-              Manage your incoming session requests
+            
+            <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">Requests</h1>
+            <p className="text-gray-400 mt-2 text-lg">
+              Manage and track your incoming session requests
             </p>
           </div>
 
@@ -104,121 +116,114 @@ const ReceivedRequests = () => {
         </div>
 
         {/* Filters */}
-        <div className="flex gap-2 mb-6 border-b border-gray-800 pb-4">
+        <div className="flex flex-wrap gap-2 mb-8 border-b border-white/10 pb-6">
           {["all", "pending", "accepted", "rejected"].map((tab) => (
             <button
               key={tab}
               onClick={() => setFilter(tab)}
-              className={`px-5 py-2 rounded-full capitalize border transition ${filter === tab
-                ? "bg-white text-black border-white"
-                : "bg-gray-900 text-gray-400 border-gray-800"
+              className={`px-5 py-2.5 rounded-full capitalize border transition-all duration-300 text-sm font-medium ${filter === tab
+                ? "bg-white text-gray-950 border-white shadow-lg shadow-white/10"
+                : "bg-gray-900/50 text-gray-400 border-white/5 hover:bg-gray-800 hover:text-gray-200"
                 }`}
             >
               {tab}
-              <span className="ml-2 text-xs">
+              <span className={`ml-2 text-xs py-0.5 px-2 rounded-full ${filter === tab ? "bg-gray-950/20 text-gray-900" : "bg-gray-800 text-gray-500"}`}>
                 {tab === "all" ? stats.total : stats[tab]}
               </span>
             </button>
           ))}
         </div>
 
-        {/* Requests */}
+        {/* Requests List */}
         <div className="grid gap-4">
-          {filteredRequests.length === 0 ? (
-            <EmptyState filter={filter} />
-          ) : (
-            filteredRequests.map((req) => (
-              <div
-                key={req._id}
-                onClick={() => handleViewDetails(req)}
-                className="group bg-[#0a0a0a] border border-gray-800 rounded-2xl p-5
-                           hover:bg-[#111] hover:border-gray-700 transition cursor-pointer"
-              >
-                <div className="flex flex-col md:flex-row gap-6">
-                  {/* Left */}
-                  <div className="flex gap-4 md:w-1/3">
-                    <div
-                      className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${getAvatarGradient(
-                        req.studentName
-                      )} flex items-center justify-center text-white font-bold`}
-                    >
-                      {req.studentName?.charAt(0) || "S"}
-                    </div>
+          <AnimatePresence mode="popLayout">
+            {filteredRequests.length === 0 ? (
+              <EmptyState filter={filter} />
+            ) : (
+              filteredRequests.map((req, index) => (
+                <motion.div
+                  key={req._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
+                  onClick={() => handleViewDetails(req)}
+                  className="group bg-gray-900/60 backdrop-blur-xl border border-white/10 rounded-3xl p-6
+                             hover:bg-gray-800/80 hover:border-indigo-500/30 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-indigo-500/10 relative overflow-hidden"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 pointer-events-none" />
 
-                    <div>
-                      <h3 className="text-lg font-semibold">
-                        {req.studentName}
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        {req.studentEmail}
-                      </p>
-                      <span
-                        className={`inline-block mt-1 px-2 py-0.5 text-xs rounded border ${getStatusColor(
-                          req.status
-                        )}`}
+                  <div className="flex flex-col md:flex-row gap-6 items-start md:items-center relative z-10">
+                    {/* Left: User Info */}
+                    <div className="flex gap-4 md:w-1/3 items-center">
+                      <div
+                        className={`w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-indigo-500/20 ring-2 ring-white/10`}
                       >
-                        {req.status}
-                      </span>
-                    </div>
-                  </div>
+                        {req.studentName?.charAt(0) || "S"}
+                      </div>
 
-                  {/* Middle */}
-                  <div className="flex-1 grid grid-cols-2 gap-4 border-t md:border-t-0 md:border-l border-gray-800 pt-4 md:pt-0 md:pl-6">
-                    <div>
-                      <p className="text-xs text-gray-500">Requested Skill</p>
-                      <p className="font-medium">{req.skillName}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500">Schedule</p>
-                      {req.selectedSlots?.length ? (
-                        <>
-                          <p>{req.selectedSlots[0].day}</p>
-                          <p className="text-xs text-gray-400">
-                            {req.selectedSlots[0].startTime} -{" "}
-                            {req.selectedSlots[0].endTime}
-                          </p>
-                        </>
-                      ) : (
-                        <p className="text-gray-500 italic">
-                          No slot selected
+                      <div>
+                        <h3 className="text-lg font-bold text-white group-hover:text-indigo-400 transition-colors">
+                          {req.studentName}
+                        </h3>
+                        <p className="text-sm text-gray-500 flex items-center gap-1.5 mt-0.5">
+                          <User size={12} /> {req.studentEmail}
                         </p>
-                      )}
+                        <span
+                          className={`inline-block mt-2 px-2.5 py-1 text-xs font-semibold rounded-lg border ${getStatusColor(
+                            req.status
+                          )}`}
+                        >
+                          {req.status.toUpperCase()}
+                        </span>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Right Arrow */}
-                  <div className="flex items-center justify-end md:w-12">
-                    <div
-                      onClick={(e) => {
-                        e.stopPropagation(); // 🔑 FIX
-                        handleViewDetails(req);
-                      }}
-                      className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center
-                                 text-gray-400 group-hover:bg-white group-hover:text-black
-                                 transition-all duration-300 transform group-hover:-rotate-45"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={2}
-                        stroke="currentColor"
-                        className="w-5 h-5"
+                    {/* Middle: Details */}
+                    <div className="flex-1 grid grid-cols-2 gap-6 w-full md:w-auto border-t md:border-t-0 md:border-l border-white/10 pt-4 md:pt-0 md:pl-6">
+                      <div>
+                        <p className="text-xs text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                          <BookOpen size={12} /> Requested Skill
+                        </p>
+                        <p className="font-semibold text-gray-200">{req.skillName}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                          <Calendar size={12} /> Schedule
+                        </p>
+                        {req.selectedSlots?.length ? (
+                          <>
+                            <p className="font-medium text-gray-200">{req.selectedSlots[0].day}</p>
+                            <p className="text-xs text-indigo-400 font-mono mt-0.5 flex items-center gap-1">
+                              <Clock size={10} />
+                              {req.selectedSlots[0].startTime} - {req.selectedSlots[0].endTime}
+                            </p>
+                          </>
+                        ) : (
+                          <p className="text-gray-500 italic text-sm">
+                            No slot selected
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Right: Action */}
+                    <div className="flex items-center justify-end md:w-16 self-end md:self-center">
+                      <div
+                        className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center
+                                   text-gray-400 group-hover:bg-indigo-500 group-hover:text-white group-hover:border-indigo-500
+                                   transition-all duration-300 transform group-hover:-rotate-45 shadow-lg"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
-                        />
-                      </svg>
+                        <ArrowRight size={18} />
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            ))
-          )}
+                </motion.div>
+              ))
+            )}
+          </AnimatePresence>
         </div>
-      </div>
+      </main>
     </div>
   );
 };
@@ -226,34 +231,50 @@ const ReceivedRequests = () => {
 /* ---------- Sub Components ---------- */
 
 const StatBadge = ({ count, label, color }) => (
-  <div className="flex items-center gap-2 bg-gray-900 border border-gray-800 px-3 py-1.5 rounded-lg">
-    <div className={`w-2 h-2 rounded-full ${color}`} />
-    <span className="text-sm">
-      <b>{count}</b> {label}
+  <div className="flex items-center gap-2 bg-gray-900/60 border border-white/10 px-3 py-1.5 rounded-xl backdrop-blur-md">
+    <div className={`w-2 h-2 rounded-full ${color} shadow-[0_0_8px_currentColor]`} />
+    <span className="text-sm text-gray-300">
+      <b className="text-white">{count}</b> {label}
     </span>
   </div>
 );
 
 const EmptyState = ({ filter }) => (
-  <div className="text-center py-24 border border-dashed border-gray-800 rounded-3xl">
-    <h3 className="text-xl font-bold text-white mb-2">
+  <motion.div
+    initial={{ opacity: 0, scale: 0.95 }}
+    animate={{ opacity: 1, scale: 1 }}
+    className="text-center py-24 border border-dashed border-white/10 rounded-3xl bg-gray-900/20 flex flex-col items-center justify-center"
+  >
+    <div className="p-4 bg-gray-800/50 rounded-full mb-4">
+      <Filter size={32} className="text-gray-600" />
+    </div>
+    <h3 className="text-xl font-bold text-white mb-2 capitalize">
       No {filter === "all" ? "" : filter} requests
     </h3>
-    <p className="text-gray-500">
-      Requests will appear here when available.
+    <p className="text-gray-500 max-w-sm mx-auto">
+      Requests will appear here when students book a session with you.
     </p>
-  </div>
+  </motion.div>
 );
 
 const LoadingState = () => (
-  <div className="min-h-screen bg-black flex items-center justify-center">
-    <div className="w-12 h-12 border-4 border-gray-800 border-t-purple-500 rounded-full animate-spin" />
+  <div className="min-h-screen bg-gray-950 flex items-center justify-center relative overflow-hidden">
+    <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/20 to-purple-900/20" />
+    <div className="relative flex flex-col items-center gap-4">
+      <div className="w-12 h-12 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+      <p className="text-indigo-400 font-medium animate-pulse">Loading Dashboard...</p>
+    </div>
   </div>
 );
 
 const ErrorState = ({ error }) => (
-  <div className="min-h-screen bg-black flex items-center justify-center">
-    <p className="text-red-500">{error}</p>
+  <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+    <div className="text-center p-8 bg-red-500/10 border border-red-500/20 rounded-3xl backdrop-blur-md">
+      <AlertCircle size={48} className="text-red-400 mx-auto mb-4" />
+      <h3 className="text-xl font-bold text-white mb-2">Something went wrong</h3>
+      <p className="text-red-400 mb-6">{error}</p>
+      <button onClick={() => window.location.reload()} className="px-6 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition">Try Again</button>
+    </div>
   </div>
 );
 

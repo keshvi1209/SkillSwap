@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Plus, Trash2, Calendar, Clock, RotateCcw } from "lucide-react";
 
 const convertTo24hr = (time12) => {
   if (!time12) return "";
@@ -293,7 +294,7 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
           name={hourName}
           value={hourValue}
           onChange={onChange}
-          className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] transition-all duration-200 backdrop-blur-lg"
+          className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] transition-all duration-200 backdrop-blur-lg cursor-pointer"
         >
           <option value="" className="bg-[#1a1a2e]">
             Hour
@@ -309,7 +310,7 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
           name={minuteName}
           value={minuteValue}
           onChange={onChange}
-          className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] transition-all duration-200 backdrop-blur-lg"
+          className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] transition-all duration-200 backdrop-blur-lg cursor-pointer"
         >
           <option value="" className="bg-[#1a1a2e]">
             Minute
@@ -325,7 +326,7 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
           name={periodName}
           value={periodValue}
           onChange={onChange}
-          className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] transition-all duration-200 backdrop-blur-lg"
+          className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] transition-all duration-200 backdrop-blur-lg cursor-pointer"
         >
           {generateTimeOptions("period").map((p) => (
             <option key={p} value={p} className="bg-[#1a1a2e]">
@@ -343,7 +344,8 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
         <h2 className="text-2xl font-bold text-white mb-2">
           Manage Your Time Slots
         </h2>
-        <p className="text-gray-300">
+        <p className="text-gray-300 flex items-center justify-center gap-2">
+          <Clock size={16} className="text-[#6C63FF]" />
           Add and manage your teaching availability
         </p>
       </div>
@@ -359,7 +361,7 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
               value={slot.day}
               onChange={handleChange}
               disabled={isDailySame}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] transition-all duration-200 backdrop-blur-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-[#6C63FF] focus:border-[#6C63FF] transition-all duration-200 backdrop-blur-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               <option value="" className="bg-[#1a1a2e]">
                 Choose a day
@@ -404,11 +406,11 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
                 type="checkbox"
                 checked={isDailySame}
                 onChange={handleChange}
-                className="h-5 w-5 text-[#6C63FF] border-white/20 rounded focus:ring-2 focus:ring-[#6C63FF] bg-white/5"
+                className="h-5 w-5 text-[#6C63FF] border-white/20 rounded focus:ring-2 focus:ring-[#6C63FF] bg-white/5 cursor-pointer"
               />
               <label
                 htmlFor="daily-same"
-                className="ml-3 text-sm font-medium text-white"
+                className="ml-3 text-sm font-medium text-white cursor-pointer"
               >
                 Apply same schedule to all weekdays
               </label>
@@ -420,20 +422,8 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
             onClick={addSlot}
             className="w-full px-6 py-4 bg-gradient-to-r from-[#6C63FF] to-[#4a3fdb] text-white font-semibold rounded-2xl transition-all duration-200 hover:shadow-lg hover:shadow-purple-500/25 hover:-translate-y-1 focus:ring-2 focus:ring-[#6C63FF] focus:ring-offset-2 focus:ring-offset-[#1a1a2e]"
           >
-            <div className="flex items-center justify-center">
-              <svg
-                className="w-5 h-5 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
+            <div className="flex items-center justify-center gap-2">
+              <Plus size={20} />
               {isDailySame ? "Add Weekly Schedule" : "Add Time Slot"}
             </div>
           </button>
@@ -450,23 +440,11 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
             </div>
           </div>
 
-          <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
+          <div className="space-y-4 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
             {availability.length === 0 ? (
               <div className="text-center py-8">
                 <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <svg
-                    className="w-8 h-8 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
+                  <Calendar size={32} className="text-gray-400" />
                 </div>
                 <p className="text-gray-400 text-sm">
                   No time slots added yet. Start by adding your first
@@ -501,7 +479,7 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
                           className="flex items-center justify-between bg-gradient-to-r from-[#6C63FF]/10 to-purple-500/10 border border-[#6C63FF]/20 rounded-lg px-4 py-3 group hover:border-[#6C63FF]/40 transition-all duration-200"
                         >
                           <div className="flex items-center space-x-3">
-                            <div className="w-2 h-2 bg-[#6C63FF] rounded-full"></div>
+                            <Clock size={14} className="text-[#6C63FF]" />
                             <span className="text-white font-medium text-sm">
                               {slot.startTime} - {slot.endTime}
                             </span>
@@ -509,10 +487,10 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
                           <button
                             type="button"
                             onClick={() => removeSlot(globalIndex)}
-                            className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 font-bold text-lg transition-all duration-200 p-1 hover:bg-red-500/10 rounded"
+                            className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 transition-all duration-200 p-1 hover:bg-red-500/10 rounded"
                             aria-label="Remove slot"
                           >
-                            ×
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       );
@@ -530,13 +508,14 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
         <button
           type="button"
           onClick={closeCard}
-          className="px-8 py-3 bg-white/5 border border-white/10 text-white font-medium rounded-2xl transition-all duration-200 hover:bg-white/10 hover:-translate-y-0.5 backdrop-blur-lg"
+          className="px-8 py-3 bg-white/5 border border-white/10 text-white font-medium rounded-2xl transition-all duration-200 hover:bg-white/10 hover:-translate-y-0.5 backdrop-blur-lg flex items-center gap-2"
         >
+          <RotateCcw size={18} />
           Cancel
         </button>
 
         <div className="flex items-center space-x-4">
-          <span className="text-sm text-gray-300">
+          <span className="text-sm text-gray-300 hidden sm:inline">
             {availability.length} time slot
             {availability.length !== 1 ? "s" : ""} configured
           </span>
@@ -555,3 +534,4 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
 }
 
 export default AvailabilityCard;
+

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Pencil } from "lucide-react";
+import { Pencil, Music, Code, Globe, Clock, BarChart } from "lucide-react";
 
 function Addedskillssummary({ skills }) {
   const Navigate = useNavigate();
@@ -7,108 +7,106 @@ function Addedskillssummary({ skills }) {
 
   if (!skillsArray || skillsArray.length === 0) {
     return (
-      <p className="text-center text-gray-500 py-8">No skills added yet.</p>
+      <p className="text-center text-gray-400 py-8 italic bg-gray-900/40 rounded-xl border border-dashed border-gray-700">
+        No skills added yet. Start by adding some skills!
+      </p>
     );
   }
 
-  const onEdit = (skill) => {
-    console.log("Edit skill:", skill);
-  };
-
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 p-4 bg-white rounded-lg">
+    <div className="grid gap-6 md:grid-cols-2">
       {skillsArray.map((skill, index) => {
         const data = {
-          skill: skill?.skill || "Guitar",
-          experience: skill?.experience || 1,
+          skill: skill?.skill || "Skill Name",
+          experience: skill?.experience || 0,
           description: skill?.description || "No description provided",
           proficiency: skill?.proficiency || "Beginner",
           mode: skill?.mode || "Online",
           languages: skill?.languages || ["English"],
-          tags: skill?.tags || ["dev", "music"],
+          tags: skill?.tags || [],
         };
 
         return (
           <div
             key={index}
-            className="rounded-xl border border-gray-400 bg-stone-200 p-6 shadow-sm transition-transform hover:scale-[1.02]"
+            className="group relative flex flex-col justify-between rounded-2xl border border-gray-700/50 bg-gray-800/60 backdrop-blur-md p-6 shadow-xl transition-all hover:scale-[1.02] hover:shadow-purple-500/10 hover:border-purple-500/30"
           >
-            <div className="flex justify-between items-start mb-4">
-              <div className="flex items-center gap-4">
-                {/* <div className="w-12 h-12 flex items-center justify-center rounded-full bg-indigo-100 text-indigo-600 text-2xl">
-                 🎸
-                </div> */}
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    {data.skill}
-                  </h2>
-                  <p className="text-sm text-gray-500">
-                    {data.proficiency} • {data.mode}
-                  </p>
+            {/* Header */}
+            <div>
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 text-indigo-400 border border-indigo-500/20 group-hover:from-indigo-500/30 group-hover:to-purple-500/30 transition-colors">
+                    <Code size={24} />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-white group-hover:text-indigo-300 transition-colors">
+                      {data.skill}
+                    </h2>
+                    <p className="text-xs font-medium text-gray-400 flex items-center gap-1.5 uppercase tracking-wide">
+                      <span className={`w-1.5 h-1.5 rounded-full ${data.proficiency === 'Expert' ? 'bg-purple-500' :
+                          data.proficiency === 'Intermediate' ? 'bg-blue-500' : 'bg-green-500'
+                        }`}></span>
+                      {data.proficiency}
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() =>
+                    Navigate("/editcanteach", { state: { id: skill._id } })
+                  }
+                  className="p-2 rounded-lg bg-gray-700/50 text-gray-400 hover:bg-indigo-500 hover:text-white transition-all transform hover:rotate-12"
+                  title="Edit Skill"
+                >
+                  <Pencil size={18} />
+                </button>
+              </div>
+
+              <p className="text-sm text-gray-300 mb-6 leading-relaxed line-clamp-3">
+                {data.description}
+              </p>
+
+              {/* Details Grid */}
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-900/50 border border-gray-700/50">
+                  <Clock size={14} className="text-indigo-400" />
+                  <div className="flex flex-col">
+                    <span className="text-[10px] text-gray-500 uppercase font-semibold">Experience</span>
+                    <span className="text-xs text-gray-200 font-medium">{data.experience} yrs</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-900/50 border border-gray-700/50">
+                  <Globe size={14} className="text-pink-400" />
+                  <div className="flex flex-col">
+                    <span className="text-[10px] text-gray-500 uppercase font-semibold">Mode</span>
+                    <span className="text-xs text-gray-200 font-medium">{data.mode}</span>
+                  </div>
                 </div>
               </div>
-              <button
-                onClick={() =>
-                  Navigate("/editcanteach", { state: { id: skill._id } })
-                }
-                className="flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-800 transition px-3 py-1 rounded-full bg-indigo-400 hover:bg-indigo-200"
-              >
-                <Pencil size={16} /> Edit
-              </button>{" "}
             </div>
 
-            <p className="text-sm text-gray-600 mb-4">{data.description}</p>
+            {/* Tags Footer */}
+            <div className="pt-4 border-t border-gray-700/50">
+              <div className="flex flex-wrap gap-2">
+                {data.tags.length > 0 ? (
+                  data.tags.map((tag, i) => (
+                    <span
+                      key={i}
+                      className="px-2.5 py-1 text-[11px] font-medium text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 rounded-md"
+                    >
+                      #{tag}
+                    </span>
+                  ))
+                ) : (
+                  <span className="text-xs text-gray-500 italic">No tags</span>
+                )}
 
-            <div className="space-y-2 text-sm text-gray-700">
-              <div className="flex items-center gap-2">
-                <span className="text-gray-400">
-                  <Pencil size={16} />
-                </span>
-                <span>
-                  <span className="font-medium">Experience:</span>{" "}
-                  {data.experience} yrs
-                </span>
-              </div>
-              {/* <div className="flex items-center gap-2">
-                <span className="text-gray-400">
-                  <Pencil size={16} />
-                </span>
-                <span>
-                  <span className="font-medium">Availability:</span>{" "}
-                  {data.availability.mode}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-gray-400">
-                  <Pencil size={16} />
-                </span>
-                <span>
-                  <span className="font-medium">Time:</span> {data.time.start} –{" "}
-                  {data.time.end}
-                </span>
-              </div> */}
-              <div className="flex items-center gap-2">
-                <span className="text-gray-400">
-                  <Pencil size={16} />
-                </span>
-                <span>
-                  <span className="font-medium">Languages:</span>{" "}
-                  {data.languages.join(", ")}
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-4">
-              <span className="font-medium text-sm text-gray-600">Tags:</span>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {data.tags.map((tag, i) => (
-                  <span
-                    key={i}
-                    className="px-3 py-1 text-xs font-medium text-indigo-700 bg-indigo-50 rounded-full"
-                  >
-                    #{tag}
+                {data.languages.length > 0 && (
+                  <span className="px-2.5 py-1 text-[11px] font-medium text-purple-300 bg-purple-500/10 border border-purple-500/20 rounded-md">
+                    🗣️ {data.languages[0]}
                   </span>
-                ))}
+                )}
               </div>
             </div>
           </div>

@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+
 const TabNavigation = ({ activeTab, onTabChange, teachCount, learnCount, reviewCount }) => {
   const tabs = [
     { id: "teach", label: "Skills to Teach", count: teachCount },
@@ -6,24 +8,38 @@ const TabNavigation = ({ activeTab, onTabChange, teachCount, learnCount, reviewC
   ];
 
   return (
-    <div className="border-b border-gray-700/50">
-      <div className="flex overflow-x-auto">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            className={`px-6 py-4 font-semibold text-sm md:text-base transition-all whitespace-nowrap ${
-              activeTab === tab.id
-                ? "text-indigo-400 border-b-2 border-indigo-400 bg-indigo-500/5"
-                : "text-gray-400 hover:text-gray-300 hover:bg-gray-700/30"
-            }`}
-            onClick={() => onTabChange(tab.id)}
-          >
-            {tab.label}
-            <span className="ml-2 bg-gray-700/50 text-gray-300 text-xs py-1 px-2.5 rounded-full font-medium">
-              {tab.count}
-            </span>
-          </button>
-        ))}
+    <div className="border-b border-white/10 bg-white/5 backdrop-blur-sm rounded-t-2xl overflow-hidden">
+      <div className="flex w-full">
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => onTabChange(tab.id)}
+              className={`relative flex-1 px-4 py-4 sm:px-6 sm:py-5 flex items-center justify-center gap-3 transition-colors ${isActive ? "text-white" : "text-gray-400 hover:text-gray-200 hover:bg-white/5"
+                }`}
+            >
+              {isActive && (
+                <motion.div
+                  layoutId="activeTab"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-500 to-purple-500"
+                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                />
+              )}
+              <span className="font-medium text-sm sm:text-base relative z-10">
+                {tab.label}
+              </span>
+              <span
+                className={`py-0.5 px-2 rounded-full text-xs font-semibold transition-colors ${isActive
+                    ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/40"
+                    : "bg-gray-800 text-gray-500 border border-white/5"
+                  }`}
+              >
+                {tab.count}
+              </span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

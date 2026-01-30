@@ -171,19 +171,12 @@ function Tolearn() {
       </div>
 
       {/* Submit Buttons */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6">
+      <div className="pt-6">
         <button
           type="submit"
           className="w-full px-6 py-3 bg-gradient-to-r from-[#6C63FF] to-[#4a3fdb] text-white font-semibold rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-purple-500/25 hover:-translate-y-0.5 focus:ring-2 focus:ring-[#6C63FF] focus:ring-offset-2 focus:ring-offset-[#1a1a2e] skill-submit-button"
         >
           Submit
-        </button>
-
-        <button
-          type="button"
-          className="w-full px-6 py-3 bg-[rgba(45,45,55,0.7)] border border-white/10 text-white font-semibold rounded-xl transition-all duration-200 hover:bg-[rgba(55,55,65,0.8)] hover:-translate-y-0.5 focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-[#1a1a2e]"
-        >
-          Added skills
         </button>
       </div>
 
