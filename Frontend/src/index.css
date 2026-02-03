@@ -102,3 +102,26 @@ html, body {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(108, 99, 255, 0.6);
 }
+
+/* Custom Scrollbar Logic */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.2); /* Faint Indigo */
+  border-radius: 10px;
+}
+
+.custom-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.5); /* Stronger on hover */
+}
+
+/* Fix for containers to ensure they don't push off screen */
+.min-h-0 {
+  min-height: 0;
+}
