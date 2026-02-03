@@ -8,12 +8,12 @@ import path from "path";
 import { fileURLToPath } from "url";
 import authRoutes from "./route/auth.js";
 import meetRoutes from "./route/meet.js";
+
+import chatRoutes from "./route/chat.js";
 import socketHandler from "./socket/socket.js";
-
-
 import { createServer } from "http";
 import { Server } from "socket.io";
-import Message from "./model/chat/Message.js"; 
+import Message from "./model/chat/Message.js";
 dotenv.config();
 connectdb();
 
@@ -76,19 +76,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/auth", authRoutes);
 app.use("/", routes);
 app.use("/meet", meetRoutes);
-
-// --- 4. CHAT HISTORY ROUTE ---
-app.get("/chats/:roomId", async (req, res) => {
-  try {
-    const { roomId } = req.params;
-    // Fetch messages sorted by creation time (Oldest -> Newest)
-    const messages = await Message.find({ roomId }).sort({ createdAt: 1 });
-    res.status(200).json(messages);
-  } catch (err) {
-    console.error("Error fetching chats:", err);
-    res.status(500).json({ error: "Failed to fetch chat history" });
-  }
-});
+app.use("/chat", chatRoutes);
 
 // --- 5. SOCKET.IO LOGIC ---
 socketHandler(io);

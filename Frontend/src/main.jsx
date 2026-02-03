@@ -1,6 +1,6 @@
 import { StrictMode, useEffect } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import "./index.css";
 import EditCanteach from "./components/skills/Editcanteachskill.jsx";
@@ -20,11 +20,16 @@ import RequestDetails from "./components/requests/RequestDetails.jsx";
 import ReceivedRequests from "./components/requests/ReceivedRequests.jsx";
 import AvailabilityPage from "./pages/profile/AvailabilityPage.jsx";
 import ScheduleCalendar from "./components/booking/ScheduleCalendar.jsx";
-import { connectSocket, disconnectSocket } from './components/socket/socketService.js';
+import {
+  connectSocket,
+  disconnectSocket,
+} from "./components/socket/socketService.js";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Chatpage from "./pages/chat/Chatpage.jsx";
 function AuthInitializer({ children }) {
-  const { setUser } = useAuth();
+  const { user, setUser } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Check if token already exists in localStorage (from login or OAuth callback)
@@ -44,8 +49,9 @@ function AuthInitializer({ children }) {
       }
     }
   }, [setUser]);
- useEffect(() => {
-    const email = localStorage.getItem("email");
+
+  useEffect(() => {
+    const email = user?.email || localStorage.getItem("email");
     let socket;
 
     if (email) {
@@ -53,31 +59,57 @@ function AuthInitializer({ children }) {
 
       // 🔥 LISTENER: This runs when someone sends YOU a message
       socket.on("receive_message", (data) => {
-        console.log("Message received:", data);
-        
-        // Trigger the Global Toast
-        toast.info(`🔔 New Notification: ${data.message}`, {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
-      });
+        console.log("Message received:", data.fromName, data.message);
 
-    } else {
-      console.warn("⚠️ No email found in localStorage");
+        const isChatPage = window.location.pathname.startsWith("/chat");
+        if (!window.location.href.includes(data.fromEmail)) {
+          console.log("🔔 Showing toast for:", data.fromName);
+          toast.info(
+            <div>
+              <p>Message from {data.fromName}</p>
+              {/* <p style={{ fontSize: '12px', margin: '5px 0' }}>{data.message.substring(0, 40)}...</p> */}
+              <button
+                onClick={() => navigate("/chat")}
+                style={{
+                  background: "#007bff",
+                  color: "white",
+                  border: "none",
+                  padding: "2px 8px",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  
+                  marginTop: "4px",
+                }}
+              >
+                View message
+              </button>
+            </div>,
+            {
+              position: "bottom-right",
+              autoClose: 5000,
+              closeOnClick: false,
+              pauseOnHover: true,
+              draggable: true,
+              icon : false,
+            },
+          );
+        } else {
+          console.log(
+            "🔕 Suppressing toast because user is on chat page for:",
+            data.fromEmail,
+          );
+        }
+      });
     }
 
-    // Cleanup: Remove listener and disconnect on unmount
+    // Cleanup: Remove listener and disconnect on unmount or when user changes
     return () => {
       if (socket) {
-        socket.off("receive_message"); // Stop listening to avoid duplicates
+        socket.off("receive_message");
       }
       disconnectSocket();
     };
-  }, []); // Dependency array remains empty
+  }, [user]);
 
   return children;
 }
@@ -87,7 +119,11 @@ createRoot(document.getElementById("root")).render(
     <BrowserRouter>
       <AuthProvider>
         <AuthInitializer>
-         <ToastContainer position="bottom-right" />
+          <ToastContainer
+            position="bottom-right"
+            theme="dark"
+            style={{ zIndex: 9999 }}
+          />
           <Routes>
             <Route element={<Entrypage />}>
               <Route path="/" element={<HomePage />} />
@@ -104,9 +140,10 @@ createRoot(document.getElementById("root")).render(
             <Route path="/ReceivedRequests" element={<ReceivedRequests />} />
             <Route path="/availability" element={<AvailabilityPage />} />
             <Route path="/schedule-calendar" element={<ScheduleCalendar />} />
+            <Route path="/chat" element={<Chatpage />} />
           </Routes>
         </AuthInitializer>
       </AuthProvider>
     </BrowserRouter>
-  </StrictMode>
+  </StrictMode>,
 );

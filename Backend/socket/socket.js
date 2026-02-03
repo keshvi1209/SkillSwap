@@ -1,3 +1,4 @@
+import Message from "../model/chat/Message.js";
 
 const emailToSocketMap = new Map();
 
@@ -7,17 +8,36 @@ const socketHandler = (io) => {
 
     socket.on("join", ({ email }) => {
       emailToSocketMap.set(email, socket.id);
-      console.log("Users:", emailToSocketMap);
       console.log(`User joined -> Email: ${email}, SocketID: ${socket.id}`);
     });
 
-    socket.on("send_message", ({ toEmail, message }) => {
+    // Added 'async' here so you can use 'await' for the DB call
+    socket.on("send_message", async ({ fromName, fromEmail, toEmail, message }) => {
       const receiverSocketId = emailToSocketMap.get(toEmail);
 
-      if (receiverSocketId) {
-        io.to(receiverSocketId).emit("receive_message", { message });
+      try {
+        // 1. Save to Database
+        const newMessage = await Message.create({
+          senderEmail: fromEmail,
+          receiverEmail: toEmail,
+          senderName: fromName,
+          content: message,
+          // Note: If your schema uses timestamps: true, you don't strictly need 'timestamp' field
+        });
+
+        // 2. Emit to receiver if online
+        if (receiverSocketId) {
+          // Sending back the whole object (including fromEmail) helps the frontend route correctly
+          io.to(receiverSocketId).emit("receive_message", { 
+            fromName, 
+            fromEmail, 
+            message 
+          });
+        }
+      } catch (error) {
+        console.error("Error saving message:", error);
       }
-    });
+    }); // End of send_message
 
     socket.on("disconnect", () => {
       for (const [email, socketId] of emailToSocketMap.entries()) {
@@ -28,7 +48,7 @@ const socketHandler = (io) => {
       }
       console.log("Disconnected:", socket.id);
     });
-  });
+  }); // End of connection
 };
 
 export default socketHandler;

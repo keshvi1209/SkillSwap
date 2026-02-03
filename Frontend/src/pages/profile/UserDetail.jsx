@@ -9,7 +9,7 @@ import TabNavigation from "../../components/layout/TabNavigation";
 import TeachTab from "../../components/skills/TeachTab";
 import LearnTab from "../../components/skills/LearnTab";
 import ReviewsTab from "../../components/reviews/ReviewsTab";
-import { getSocket } from "../../components/socket/socketService"; 
+import { getSocket } from "../../components/socket/socketService";
 import { toast } from "react-toastify";
 // 1. IMPORT ICONS
 import { X, Send } from "lucide-react";
@@ -18,7 +18,7 @@ const UserDetail = () => {
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState("teach");
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
-  
+
   // --- CHAT STATES ---
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -31,7 +31,9 @@ const UserDetail = () => {
 
   // Get current logged in user ID for chat alignment
   const currentUserToken = token ? jwtDecode(token) : null;
-  const currentUserId = currentUserToken?.id;
+  // const currentUserId = currentUserToken?.id;
+  const currentUserName = currentUserToken?.name;
+  const currentUserEmail = currentUserToken?.email;
 
   const mockFeedback = [
     {
@@ -70,6 +72,27 @@ const UserDetail = () => {
     }
   }, [userId, token]);
 
+  // --- FETCH CHAT HISTORY ---
+  useEffect(() => {
+    if (isChatOpen && user?.email && currentUserToken) {
+      const fetchHistory = async () => {
+        try {
+          const res = await api.get(`/chat/messages/${user.email}`);
+          // Map to local state structure
+          const mappedMessages = res.data.map(msg => ({
+            message: msg.content,
+            time: new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            isMe: msg.senderEmail === currentUserToken.email
+          }));
+          setMessages(mappedMessages);
+        } catch (err) {
+          console.error("Failed to load history", err);
+        }
+      };
+      fetchHistory();
+    }
+  }, [isChatOpen, user, currentUserToken?.email]);
+
   // --- AUTO SCROLL TO BOTTOM OF CHAT ---
   useEffect(() => {
     if (isChatOpen) {
@@ -80,21 +103,25 @@ const UserDetail = () => {
   // --- SOCKET LISTENER FOR INCOMING MESSAGES ---
   useEffect(() => {
     const socket = getSocket();
-    
+
     // We only want to add the message to the list if the chat window is OPEN
     // and the message is actually meant for this conversation
     const handleReceiveMessage = (data) => {
-        if (isChatOpen) {
-            setMessages((prev) => [...prev, { ...data, isMe: false }]);
-        }
+      if (isChatOpen && data.fromEmail === user.email) {
+        setMessages((prev) => [...prev, {
+          message: data.message,
+          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          isMe: false
+        }]);
+      }
     };
 
     socket.on("receive_message", handleReceiveMessage);
 
     return () => {
-        socket.off("receive_message", handleReceiveMessage);
+      socket.off("receive_message", handleReceiveMessage);
     };
-  }, [isChatOpen]);
+  }, [isChatOpen, user?.email]);
 
 
   const handleSubmitFeedback = (feedback) => {
@@ -125,9 +152,11 @@ const UserDetail = () => {
     const socket = getSocket();
 
     // Emit to server
-    socket.emit("send_message", { 
-      toEmail: user.email, 
-      message: currentMessage 
+    socket.emit("send_message", {
+      fromName: currentUserName,
+      fromEmail: currentUserToken.email,
+      toEmail: user.email,
+      message: currentMessage
     });
 
     // Add to local state (Optimistic UI)
@@ -195,7 +224,7 @@ const UserDetail = () => {
       {isChatOpen && (
         <div className="fixed inset-0 z-50 flex justify-end bg-slate-950/60 backdrop-blur-sm transition-all duration-300">
           <div className="w-full md:w-96 bg-slate-900 h-full shadow-2xl flex flex-col border-l border-slate-800 animate-in slide-in-from-right duration-300">
-            
+
             {/* Header */}
             <div className="p-6 border-b border-slate-800 flex items-center justify-between bg-slate-900/95 backdrop-blur">
               <div>
@@ -227,17 +256,16 @@ const UserDetail = () => {
               {messages.map((msg, index) => (
                 <div key={index} className={`flex ${msg.isMe ? "justify-end" : "justify-start"}`}>
                   <div
-                    className={`p-4 rounded-2xl text-sm max-w-[85%] border ${
-                      msg.isMe
+                    className={`p-4 rounded-2xl text-sm max-w-[85%] border ${msg.isMe
                         ? "bg-indigo-600 text-white rounded-tr-none border-indigo-500"
                         : "bg-slate-800 text-slate-200 rounded-tl-none border-slate-700/50"
-                    }`}
+                      }`}
                   >
                     <p className="break-words">{msg.message}</p>
                     {msg.time && (
-                        <p className={`text-[10px] mt-1 text-right ${msg.isMe ? "text-indigo-200" : "text-slate-500"}`}>
+                      <p className={`text-[10px] mt-1 text-right ${msg.isMe ? "text-indigo-200" : "text-slate-500"}`}>
                         {msg.time}
-                        </p>
+                      </p>
                     )}
                   </div>
                 </div>

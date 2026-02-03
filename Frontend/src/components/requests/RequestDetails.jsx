@@ -1,7 +1,7 @@
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import { io } from "socket.io-client";
-import api from "../../services/api"; // Ensure this axios instance has baseURL set
+import { getSocket } from "../../components/socket/socketService"; // Updated import
+import api from "../../services/api";
 import {
   Calendar,
   MessageSquare,
@@ -15,8 +15,8 @@ import {
   Loader2,
 } from "lucide-react";
 
-// Use Environment Variable for URL, fallback to localhost
-const SOCKET_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+// Use Environment Variable for URL is handled in socketService
+
 
 const RequestDetails = () => {
   const { id } = useParams(); // Using request ID as Room ID
@@ -24,10 +24,13 @@ const RequestDetails = () => {
   const location = useLocation();
 
   // Robust ID check
+  // Robust ID check
   const userId =
     localStorage.getItem("id") ||
     localStorage.getItem("userId") ||
     localStorage.getItem("_id");
+  const userEmail = localStorage.getItem("email");
+  const userName = localStorage.getItem("name");
 
   // --- STATES ---
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -53,37 +56,40 @@ const RequestDetails = () => {
 
   // --- WEBSOCKET & HISTORY CONNECTION ---
   useEffect(() => {
-    // 1. Initialize Socket
-    socketRef.current = io(SOCKET_URL);
+    // 1. Get Socket
+    const socket = getSocket();
+    socketRef.current = socket;
 
-    // 2. Join Room
-    socketRef.current.emit("join_room", id);
+    // 2. Listen for Messages
+    const handleReceiveMessage = (data) => {
+      // Filter messages relevant to this conversation (between user and student)
+      // data: { fromName, fromEmail, message }
+      if (data.fromEmail === request.studentEmail || data.fromEmail === userEmail) {
+        // Note: if I send a message, I optimistically add it. But if I receive my own message from another tab?
+        // For now, only add if it's from the other person
+        if (data.fromEmail === request.studentEmail) {
+          setMessages((prev) => [...prev, {
+            senderEmail: data.fromEmail,
+            receiverEmail: userEmail,
+            content: data.message,
+            createdAt: new Date().toISOString(),
+            senderName: data.fromName
+          }]);
+        }
+      }
+    };
 
-    // 3. Listen for Messages
-    socketRef.current.on("receive_message", (data) => {
-      setMessages((prev) => [...prev, data]);
-    });
+    socket.on("receive_message", handleReceiveMessage);
+    setIsConnected(socket.connected);
 
-    // 4. Listen for Connection Events
-    socketRef.current.on("connect", () => {
-      console.log("✅ Socket Connected:", socketRef.current.id);
-      setIsConnected(true);
-    });
+    socket.on("connect", () => setIsConnected(true));
+    socket.on("disconnect", () => setIsConnected(false));
 
-    socketRef.current.on("disconnect", () => {
-      console.log("❌ Socket Disconnected");
-      setIsConnected(false);
-    });
-
-    socketRef.current.on("connect_error", (err) => {
-      console.error("⚠️ Socket Connection Error:", err);
-      setIsConnected(false);
-    });
-
-    // 5. FETCH HISTORY FROM DB (Crucial Step)
+    // 3. FETCH HISTORY FROM DB
     const fetchHistory = async () => {
+      if (!request.studentEmail) return;
       try {
-        const res = await api.get(`/chats/${id}`);
+        const res = await api.get(`/chat/messages/${request.studentEmail}`);
         if (res.data) {
           setMessages(res.data);
         }
@@ -95,9 +101,11 @@ const RequestDetails = () => {
 
     // Cleanup
     return () => {
-      socketRef.current.disconnect();
+      socket.off("receive_message", handleReceiveMessage);
+      socket.off("connect");
+      socket.off("disconnect");
     };
-  }, [id]);
+  }, [request.studentEmail, userEmail]);
 
   // --- AUTO SCROLL ---
   useEffect(() => {
@@ -108,27 +116,33 @@ const RequestDetails = () => {
   const handleSendMessage = async () => {
     if (currentMessage.trim() === "") return;
 
-    if (!userId) {
-      alert("Error: User ID missing. Please log in again.");
+    if (!userEmail) {
+      alert("Error: User Email missing. Please log in again.");
       return;
     }
 
-    const messageData = {
-      room: id,
-      authorId: userId,
-      authorName: "Teacher", // You might want to fetch real name from localStorage
-      message: currentMessage,
-      time: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
+    const socket = getSocket();
+
+    const msgData = {
+      fromName: userName,
+      fromEmail: userEmail,
+      toEmail: request.studentEmail,
+      message: currentMessage
     };
 
     // Emit to Server
-    await socketRef.current.emit("send_message", messageData);
+    socket.emit("send_message", msgData);
 
-    // Optimistic UI Update (Show instantly)
-    setMessages((list) => [...list, messageData]);
+    // Optimistic UI Update
+    const newMessage = {
+      senderEmail: userEmail,
+      receiverEmail: request.studentEmail,
+      content: currentMessage,
+      createdAt: new Date().toISOString(),
+      senderName: userName
+    };
+
+    setMessages((list) => [...list, newMessage]);
     setCurrentMessage("");
   };
 
@@ -341,14 +355,15 @@ const RequestDetails = () => {
                 </div>
 
                 {messages.map((msg, index) => {
-                  const isMe = msg.authorId === userId;
+                  const isMe = msg.senderEmail === userEmail;
+                  const time = msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "";
                   return (
-                    <div key={index} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
+                    <div key={msg._id || index} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
                       <div className={`p-4 rounded-2xl text-sm max-w-[85%] border ${isMe ? "bg-indigo-600 text-white rounded-tr-none border-indigo-500" : "bg-slate-800 text-slate-200 rounded-tl-none border-slate-700/50"
                         }`}>
-                        <p className="break-words">{msg.message}</p>
+                        <p className="break-words">{msg.content}</p>
                         <p className={`text-[10px] mt-1 text-right ${isMe ? "text-indigo-200" : "text-slate-500"}`}>
-                          {msg.time}
+                          {time}
                         </p>
                       </div>
                     </div>

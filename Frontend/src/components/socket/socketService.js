@@ -1,30 +1,39 @@
 import io from "socket.io-client";
-import { toast } from "react-toastify";
-// 1. Define your Backend URL (Use env variable)
+
 const SOCKET_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 let socket;
 
 export const connectSocket = (email) => {
+  // If socket exists but we have a new email (e.g., user switched accounts), 
+  // we should re-emit join or reconnect.
   if (!socket) {
     socket = io(SOCKET_URL, {
       withCredentials: true,
       transports: ["websocket"],
     });
 
+    socket.on("connect", () => {
+      console.log("✅ Socket Connected:", socket.id);
+      // It's safer to emit join inside the 'connect' listener 
+      // to handle auto-reconnects properly
+      if (email) socket.emit("join", { email });
+    });
+  } else if (email) {
+    // If socket already exists, just make sure we are 'joined' with the right email
     socket.emit("join", { email });
-    // toast.success("Hey! You are connected 🚀", {
-    //   position: "bottom-right",
-    //   autoClose: 3000,
-    // });
   }
 
   return socket;
 };
 
 export const getSocket = () => {
+  // Instead of auto-connecting without an email, return null or 
+  // pull the email from localStorage inside this function
   if (!socket) {
-    return connectSocket(); // Auto-connect if accessed before initialization
+    const savedEmail = localStorage.getItem("email");
+    if (savedEmail) return connectSocket(savedEmail);
+    console.warn("⚠️ getSocket called but no socket or saved email found.");
   }
   return socket;
 };
