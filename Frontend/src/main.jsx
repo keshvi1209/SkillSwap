@@ -26,7 +26,7 @@ import {
 } from "./components/socket/socketService.js";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Chatpage from "./pages/chat/Chatpage.jsx";
+import Chatpage from "./pages/chat/ChatPage.jsx";
 function AuthInitializer({ children }) {
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
@@ -77,7 +77,7 @@ function AuthInitializer({ children }) {
                   padding: "2px 8px",
                   borderRadius: "4px",
                   cursor: "pointer",
-                  
+
                   marginTop: "4px",
                 }}
               >
@@ -90,7 +90,7 @@ function AuthInitializer({ children }) {
               closeOnClick: false,
               pauseOnHover: true,
               draggable: true,
-              icon : false,
+              icon: false,
             },
           );
         } else {
