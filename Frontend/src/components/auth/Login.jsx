@@ -70,8 +70,12 @@ function Login() {
   };
 
   const handleLogin = () => {
+    console.log("Initiating login...");
+    console.log("VITE_API_URL from env:", import.meta.env.VITE_API_URL);
+
     const BACKEND = import.meta.env.VITE_API_URL || "http://localhost:5000";
-    console.log("Backend URL:", BACKEND);
+    console.log("Resolved Backend URL:", BACKEND);
+
     window.location.href = `${BACKEND}/auth/login`;
   };
 

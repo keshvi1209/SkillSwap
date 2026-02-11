@@ -19,6 +19,8 @@ connectdb();
 
 const app = express();
 
+console.log('FRONTEND_ORIGIN:', process.env.FRONTEND_ORIGIN);
+
 // --- 2. CREATE HTTP SERVER ---
 const httpServer = createServer(app);
 
@@ -27,9 +29,13 @@ const __dirname = path.dirname(__filename);
 
 // Centralized Allowed Origins
 const allowedOrigins = [
-  "https://skill-swap-jet-one.vercel.app",
   "http://localhost:5173",
 ];
+
+if (process.env.FRONTEND_ORIGIN) {
+  const origin = process.env.FRONTEND_ORIGIN.replace(/\/$/, ""); // Remove trailing slash
+  allowedOrigins.push(origin);
+}
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

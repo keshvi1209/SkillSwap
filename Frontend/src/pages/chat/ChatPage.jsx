@@ -14,7 +14,7 @@ const ChatPage = () => {
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
 
-  useEffect(() => {
+  useEffect(() => {  
     fetchConversations();
   }, []);
 

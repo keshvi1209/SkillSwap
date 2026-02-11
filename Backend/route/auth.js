@@ -22,13 +22,24 @@ router.get("/login", (req, res) => {
   // ... (Logging remains the same)
   console.log("🔵 /auth/login hit");
 
-  const url = oauth2Client.generateAuthUrl({
-    access_type: "offline",
-    prompt: "consent", // 'consent' forces a refresh token, but merging is still safer
-    scope: SCOPES,
-  });
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET || !process.env.REDIRECT_URI) {
+    console.error("Missing Env Vars: CLIENT_ID, CLIENT_SECRET, or REDIRECT_URI");
+    return res.status(500).json({ error: "Server misconfiguration: Missing Google Auth Env Vars" });
+  }
 
-  return res.redirect(url);
+  try {
+    const url = oauth2Client.generateAuthUrl({
+      access_type: "offline",
+      prompt: "consent", // 'consent' forces a refresh token, but merging is still safer
+      scope: SCOPES,
+    });
+
+    console.log("Redirecting to Google Auth URL:", url);
+    return res.redirect(url);
+  } catch (error) {
+    console.error("Error generating auth URL:", error);
+    return res.status(500).json({ error: "Failed to generate auth URL" });
+  }
 });
 
 router.get("/callback", async (req, res) => {
@@ -80,14 +91,29 @@ router.get("/callback", async (req, res) => {
       process.env.JWT_SECRET
     );
 
-    const frontend = process.env.FRONTEND_ORIGIN ;
+    let frontend = process.env.FRONTEND_ORIGIN;
+    if (!frontend) {
+      console.error("Missing FRONTEND_ORIGIN env var");
+      return res.status(500).json({ error: "Configuration Error: FRONTEND_ORIGIN missing" });
+    }
+
+    // Remove trailing slash if present to avoid double slashes in redirect
+    if (frontend.endsWith("/")) {
+      frontend = frontend.slice(0, -1);
+    }
+
     return res.redirect(`${frontend}/login?token=${token}`);
   } catch (err) {
     console.error("Auth Error:", err);
+    let frontend = process.env.FRONTEND_ORIGIN;
+    if (frontend) {
+      if (frontend.endsWith("/")) {
+        frontend = frontend.slice(0, -1);
+      }
+      return res.redirect(`${frontend}/login?error=${encodeURIComponent(err.message)}`);
+    }
     return res.status(500).json({ error: err.message });
   }
 });
-
-// ... (Rest of file remains the same)
 
 export default router;
