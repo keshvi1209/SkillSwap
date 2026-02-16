@@ -14,7 +14,6 @@ function Login() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
- 
   useEffect(() => {
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -24,15 +23,28 @@ function Login() {
     }
 
     const interval = setInterval(() => {
-      if (window.google) {
-        window.google.accounts.id.initialize({
+      if (window.google && window.google.accounts) {
+        const codeClient = window.google.accounts.oauth2.initCodeClient({
           client_id: clientId,
+
+          // 🔥 IMPORTANT: Request calendar scope
+          scope:
+            "openid email profile https://www.googleapis.com/auth/calendar",
+
+          access_type: "offline", // needed for refresh token
+          prompt: "consent", // forces refresh token first time
+          ux_mode: "popup",
+
           callback: async (response) => {
             try {
-              const googleToken = response.credential;
+              if (!response.code) {
+                console.error("No auth code received");
+                return;
+              }
 
+              // 🔥 Send authorization code to backend
               const res = await api.post("/auth/google", {
-                token: googleToken,
+                code: response.code,
               });
 
               const data = res.data;
@@ -56,14 +68,14 @@ function Login() {
           },
         });
 
-        window.google.accounts.id.renderButton(
-          document.getElementById("googleBtn"),
-          {
-            theme: "outline",
-            size: "large",
-            width: "100%",
-          }
-        );
+        // 🔥 Attach click to your existing button div
+        const googleBtn = document.getElementById("googleBtn");
+
+        if (googleBtn) {
+          googleBtn.onclick = () => {
+            codeClient.requestCode();
+          };
+        }
 
         clearInterval(interval);
       }
@@ -199,7 +211,13 @@ function Login() {
       </div>
 
       {/* Google Button Rendered Here */}
-      <div id="googleBtn" className="w-full flex justify-center"></div>
+      <button
+        type="button"
+        id="googleBtn"
+        className="w-full py-3 bg-white text-black font-semibold rounded-xl"
+      >
+        Continue with Google
+      </button>
 
       {/* Signup */}
       <div className="mt-8 text-center">
