@@ -18,7 +18,7 @@ import {
   getReceivedRequests,
   updateBookingStatus,
 } from "../control/booking/handlebookingrequest.js";
-
+import googleAuth from "../control/auth/googleAuth.js";
 const router = Router();
 
 const storage = multer.diskStorage({
@@ -31,6 +31,7 @@ const upload = multer({ storage });
 
 router.post("/signup", signup);
 router.post("/login", login);
+router.post("/auth/google", googleAuth);
 
 router.use(authMiddleware);
 
