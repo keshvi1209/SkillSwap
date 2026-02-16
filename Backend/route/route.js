@@ -19,6 +19,7 @@ import {
   updateBookingStatus,
 } from "../control/booking/handlebookingrequest.js";
 import googleAuth from "../control/auth/googleAuth.js";
+import meet from "./meet.js";
 const router = Router();
 
 const storage = multer.diskStorage({
@@ -34,7 +35,7 @@ router.post("/login", login);
 router.post("/auth/google", googleAuth);
 
 router.use(authMiddleware);
-
+router.use("/meet", meet);
 router.post("/canteachskills", upload.array("certificates", 10), canteachskills);
 router.post("/tolearnskills", tolearnskills);
 router.get("/getcanteachskills", getCanTeachSkills);

@@ -27,9 +27,13 @@ const userSchema = new mongoose.Schema(
       default: [],
     },
     googleTokens: {
-      type: Object, 
-      default: {}
+      googleId: String,
+      picture: String,
+      provider: String,
+      refreshToken: String,
+      lastLogin: Date,
     },
+
     contact: { type: String, default: "" },
     address: { type: String, default: "" },
     city: { type: String, default: "" },
@@ -37,7 +41,7 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const User = mongoose.model("User", userSchema);

@@ -1,48 +1,44 @@
-import { OAuth2Client } from "google-auth-library";
+import { google } from "googleapis";
 import jwt from "jsonwebtoken";
 import User from "../../model/user/user.js";
 
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-
 const googleAuth = async (req, res) => {
   try {
-    const { token } = req.body;
+    const { code } = req.body;   // 🔥 Now receiving CODE, not token
 
-    if (!token) {
+    if (!code) {
       return res.status(400).json({
         success: false,
-        message: "Google token is required",
+        message: "Authorization code is required",
       });
     }
 
-    // 1️⃣ Verify Google token
-    const ticket = await client.verifyIdToken({
-      idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID,
+    // 1️⃣ Create OAuth client
+    const oAuth2Client = new google.auth.OAuth2(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.CLIENT_SECRET,
+      "postmessage" // IMPORTANT for popup flow
+    );
+
+    // 2️⃣ Exchange code for tokens
+    const { tokens } = await oAuth2Client.getToken(code);
+
+    oAuth2Client.setCredentials(tokens);
+
+    // 3️⃣ Get user info from Google
+    const oauth2 = google.oauth2({
+      auth: oAuth2Client,
+      version: "v2",
     });
 
-    const payload = ticket.getPayload();
+    const { data } = await oauth2.userinfo.get();
 
-    const {
-      email,
-      name,
-      picture,
-      email_verified,
-      sub: googleId,
-    } = payload;
+    const { email, name, picture, id: googleId } = data;
 
-    if (!email_verified) {
-      return res.status(401).json({
-        success: false,
-        message: "Email not verified by Google",
-      });
-    }
-
-    // 2️⃣ Check if user exists
+    // 4️⃣ Check if user exists
     let user = await User.findOne({ email });
 
     if (!user) {
-      // 3️⃣ Create new Google user
       user = await User.create({
         name,
         email,
@@ -51,22 +47,24 @@ const googleAuth = async (req, res) => {
           googleId,
           picture,
           provider: "google",
+          refreshToken: tokens.refresh_token, // 🔥 SAVE THIS
           lastLogin: new Date(),
         },
       });
     } else {
-      // 4️⃣ Update Google login info
+      // Update existing user
       user.googleTokens = {
         googleId,
         picture,
         provider: "google",
+        refreshToken: tokens.refresh_token || user.googleTokens?.refreshToken,
         lastLogin: new Date(),
       };
 
       await user.save();
     }
 
-    // 5️⃣ Generate App JWT
+    // 5️⃣ Generate your app JWT
     const appToken = jwt.sign(
       {
         id: user._id,
@@ -90,9 +88,9 @@ const googleAuth = async (req, res) => {
   } catch (error) {
     console.error("Google Auth Error:", error);
 
-    return res.status(401).json({
+    return res.status(500).json({
       success: false,
-      message: "Invalid Google token",
+      message: error.message,
     });
   }
 };
