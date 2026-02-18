@@ -129,27 +129,28 @@ createRoot(document.getElementById("root")).render(
             style={{ zIndex: 9999 }}
           />
           <Routes>
-             <Route element={<Entrypage />}>
-                <Route path="/" element={<HomePage />} />
-              </Route>
+            <Route path="/" element={<HomePage />} />
+
             <Route element={<PublicRoute />}>
               <Route path="/signup" element={<Signup />} />
               <Route path="/login" element={<Login />} />
             </Route>
-            <Route element={<ProtectedRoute />}>
-             
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/editcanteach" element={<EditCanteach />} />
-              <Route path="/teach" element={<TeachSkillsPage />} />
-              <Route path="/learn" element={<LearnSkillsPage />} />
-              <Route path="/app" element={<App />} />
-              <Route path="/userdetail" element={<UserDetail />} />
-              <Route path="/RequestDetails/:id" element={<RequestDetails />} />
-              <Route path="/ReceivedRequests" element={<ReceivedRequests />} />
-              <Route path="/availability" element={<AvailabilityPage />} />
-              <Route path="/schedule-calendar" element={<ScheduleCalendar />} />
-              <Route path="/chat" element={<Chatpage />} />
-              <Route path="/sessions" element={<HistoryPage />} />
+
+            <Route element={<Entrypage />}>
+              <Route element={<ProtectedRoute />}>
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/editcanteach" element={<EditCanteach />} />
+                <Route path="/teach" element={<TeachSkillsPage />} />
+                <Route path="/learn" element={<LearnSkillsPage />} />
+                <Route path="/app" element={<App />} />
+                <Route path="/userdetail" element={<UserDetail />} />
+                <Route path="/RequestDetails/:id" element={<RequestDetails />} />
+                <Route path="/ReceivedRequests" element={<ReceivedRequests />} />
+                <Route path="/availability" element={<AvailabilityPage />} />
+                <Route path="/schedule-calendar" element={<ScheduleCalendar />} />
+                <Route path="/chat" element={<Chatpage />} />
+                <Route path="/sessions" element={<HistoryPage />} />
+              </Route>
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

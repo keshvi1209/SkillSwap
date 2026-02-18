@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   Home,
@@ -37,136 +37,161 @@ function Header() {
     navigate("/login");
   };
 
-  const isActive = (path) => location.pathname === path;
+  // Better active route detection (supports nested routes)
+  const isActive = (path) => {
+    if (path === "/") return location.pathname === "/";
+    return location.pathname.startsWith(path);
+  };
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
+  // Prevent body scroll when mobile menu open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+  }, [mobileMenuOpen]);
 
   return (
     <>
-      <header className="relative z-50 border-b border-white/5 bg-gray-950/50 backdrop-blur-md py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            {/* Logo Section */}
-            <div
-              className="flex items-center gap-3 cursor-pointer group"
-              onClick={() => navigate("/")}
-            >
-              <div className="relative">
-                <div className="absolute inset-0 bg-indigo-500 rounded-md blur opacity-20 group-hover:opacity-40 transition-opacity" />
-                <img src={myimage} alt="Logo" className="h-10 w-10 relative z-10 rounded-md" />
-              </div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent tracking-tight">
-                SkillSwap
-              </h1>
-            </div>
+      {/* HEADER */}
+      <header className="fixed top-0 left-0 right-0 z-50 h-16 border-b border-white/5 bg-gray-950/70 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-1">
-              {navItems.map((item) => {
-                const active = isActive(item.path);
-                return (
-                  <button
-                    key={item.name}
-                    onClick={() => navigate(item.path)}
-                    className={`relative px-4 py-2 rounded-full flex items-center gap-2 text-sm font-medium transition-all duration-300 ${active
+          {/* Logo */}
+          <div
+            className="flex items-center gap-3 cursor-pointer group"
+            onClick={() => navigate("/")}
+          >
+            <img
+              src={myimage}
+              alt="Logo"
+              className="h-9 w-9 rounded-md"
+            />
+            <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+              SkillSwap
+            </h1>
+          </div>
+
+          {/* Desktop Nav */}
+          <nav className="hidden lg:flex items-center gap-1">
+            {navItems.map((item) => {
+              const active = isActive(item.path);
+              return (
+                <button
+                  key={item.name}
+                  onClick={() => navigate(item.path)}
+                  className={`relative px-4 py-2 rounded-full flex items-center gap-2 text-sm font-medium transition ${active
                       ? "text-white"
                       : "text-gray-400 hover:text-white"
-                      }`}
-                  >
-                    {active && (
-                      <motion.div
-                        layoutId="nav-pill"
-                        className="absolute inset-0 bg-indigo-600 rounded-full shadow-lg shadow-indigo-500/30"
-                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                      />
-                    )}
-                    <span className="relative z-10 flex items-center gap-2">
-                      <item.icon size={16} />
-                      {item.name}
-                    </span>
-                  </button>
-                );
-              })}
-            </nav>
+                    }`}
+                >
+                  {active && (
+                    <motion.div
+                      layoutId="nav-pill"
+                      className="absolute inset-0 bg-indigo-600 rounded-full"
+                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    />
+                  )}
+                  <span className="relative z-10 flex items-center gap-2">
+                    <item.icon size={16} />
+                    {item.name}
+                  </span>
+                </button>
+              );
+            })}
+          </nav>
 
-            {/* Right Actions */}
-            <div className="hidden md:flex items-center gap-4">
-              <button
-                onClick={() => navigate("/profile")}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded-xl font-medium transition-colors border border-white/5 hover:border-indigo-500/30 group"
-              >
-                <div className="p-1 bg-indigo-500/10 rounded-lg group-hover:bg-indigo-500/20 text-indigo-400 transition-colors">
-                  <User size={18} />
-                </div>
-                <span>Profile</span>
-              </button>
-
-              <button
-                onClick={handleLogout}
-                className="p-2.5 text-gray-400 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-all"
-                title="Logout"
-              >
-                <LogOut size={20} />
-              </button>
-            </div>
-
-            {/* Mobile Menu Toggle */}
+          {/* Right Actions (Desktop) */}
+          <div className="hidden lg:flex items-center gap-4">
             <button
-              className="md:hidden p-2 text-gray-300 hover:text-white"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              onClick={() => navigate("/profile")}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded-xl text-sm"
             >
-              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              <User size={16} />
+              Profile
+            </button>
+
+            <button
+              onClick={handleLogout}
+              className="p-2 text-gray-400 hover:text-red-400"
+            >
+              <LogOut size={20} />
             </button>
           </div>
+
+          {/* Mobile Toggle */}
+          <button
+            className="lg:hidden p-2 text-gray-300"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
       </header>
 
-      {/* Mobile Navigation Menu */}
-      {mobileMenuOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          className="fixed inset-0 top-[70px] z-40 bg-gray-950/95 backdrop-blur-xl md:hidden"
-        >
-          <div className="p-4 space-y-4">
-            <div className="grid grid-cols-2 gap-3">
-              {navItems.map((item) => (
-                <button
-                  key={item.name}
-                  onClick={() => {
-                    navigate(item.path);
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`flex flex-col items-center justify-center p-4 rounded-2xl border transition-all ${isActive(item.path)
-                    ? "bg-indigo-600/20 border-indigo-500/50 text-indigo-300"
-                    : "bg-gray-900 border-white/5 text-gray-400 hover:bg-gray-800"
-                    }`}
-                >
-                  <item.icon size={24} className="mb-2" />
-                  <span className="text-sm font-medium">{item.name}</span>
-                </button>
-              ))}
-            </div>
+      {/* Push content below fixed header */}
+      <div className="h-16" />
 
-            <div className="pt-4 border-t border-white/10 space-y-3">
-              <button
-                onClick={() => {
-                  navigate("/profile");
-                  setMobileMenuOpen(false);
-                }}
-                className="w-full flex items-center justify-center gap-3 p-4 bg-gray-800 rounded-xl text-white font-medium"
-              >
-                <User size={20} /> My Profile
-              </button>
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center justify-center gap-3 p-4 bg-red-500/10 text-red-400 rounded-xl font-medium"
-              >
-                <LogOut size={20} /> Logout
-              </button>
+      {/* MOBILE MENU */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -20, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed top-16 left-0 right-0 bottom-0 bg-gray-950/95 backdrop-blur-xl z-40 lg:hidden overflow-y-auto"
+          >
+            <div className="p-6 space-y-6">
+
+              {/* Nav Items */}
+              <div className="grid grid-cols-2 gap-4">
+                {navItems.map((item) => (
+                  <button
+                    key={item.name}
+                    onClick={() => navigate(item.path)}
+                    className={`flex flex-col items-center justify-center p-4 rounded-2xl border transition ${isActive(item.path)
+                        ? "bg-indigo-600/20 border-indigo-500 text-indigo-300"
+                        : "bg-gray-900 border-white/10 text-gray-400"
+                      }`}
+                  >
+                    <item.icon size={24} className="mb-2" />
+                    <span className="text-sm font-medium">
+                      {item.name}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Profile + Logout */}
+              <div className="pt-4 border-t border-white/10 space-y-3">
+                <button
+                  onClick={() => navigate("/profile")}
+                  className="w-full flex items-center justify-center gap-3 p-4 bg-gray-800 rounded-xl text-white"
+                >
+                  <User size={18} />
+                  My Profile
+                </button>
+
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center justify-center gap-3 p-4 bg-red-500/10 text-red-400 rounded-xl"
+                >
+                  <LogOut size={18} />
+                  Logout
+                </button>
+              </div>
+
             </div>
-          </div>
-        </motion.div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

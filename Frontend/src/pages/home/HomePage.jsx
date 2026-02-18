@@ -9,7 +9,7 @@ import {
   GraduationCap,
   UserPlus,
   Sparkles,
-  ArrowRight
+  ArrowRight,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../services/api";
@@ -22,6 +22,8 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [results, setResults] = useState([]);
+  const [error, setError] = useState(null);
 
   const token = localStorage.getItem("token");
   const decodedtoken = token ? jwtDecode(token) : null;
@@ -70,16 +72,38 @@ export default function HomePage() {
     (item) =>
       item.name?.toLowerCase().includes(search.toLowerCase()) ||
       item.canTeach?.some((skill) =>
-        skill.toLowerCase().includes(search.toLowerCase())
+        skill.toLowerCase().includes(search.toLowerCase()),
       ) ||
       item.toLearn?.some((skill) =>
-        skill.toLowerCase().includes(search.toLowerCase())
-      )
+        skill.toLowerCase().includes(search.toLowerCase()),
+      ),
   );
+
+  const handleSearch = async () => {
+    if (!search.trim()) return;
+
+    try {
+      setLoading(true);
+      const { data } = await api.get("/search", {
+        params: { query: search },
+      });
+
+      // Extract the 'results' array from the response object
+      if (data.success) {
+        setResults(data.results);
+      }
+    } catch (err) {
+      setError("Search failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const displayData =
+    search.trim() && results.length > 0 ? results : filteredData;
 
   return (
     <div className="min-h-screen bg-gray-950 relative overflow-x-hidden text-gray-200 selection:bg-indigo-500/30">
-
       {/* Ambient Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[120px] animate-pulse-slow" />
@@ -97,7 +121,9 @@ export default function HomePage() {
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-8">
             <Sparkles size={16} className="text-yellow-400" />
-            <span className="text-sm font-medium text-gray-300">Welcome back, {user?.name || "Explorer"}</span>
+            <span className="text-sm font-medium text-gray-300">
+              Welcome back, {user?.name || "Explorer"}
+            </span>
           </div>
 
           <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-6 tracking-tight leading-tight">
@@ -108,8 +134,8 @@ export default function HomePage() {
           </h1>
 
           <p className="max-w-2xl mx-auto text-lg text-gray-400 mb-10 leading-relaxed">
-            Connect with skilled mentors and curious learners in a vibrant community.
-            Exchange knowledge, master new skills, and grow together.
+            Connect with skilled mentors and curious learners in a vibrant
+            community. Exchange knowledge, master new skills, and grow together.
           </p>
 
           {/* Search Bar */}
@@ -124,9 +150,16 @@ export default function HomePage() {
                 placeholder="Search for mentors, skills, or topics..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSearch();
+                }}
                 className="w-full px-4 py-5 bg-transparent text-white text-lg placeholder-gray-500 focus:outline-none"
               />
-              <button className="hidden sm:flex items-center gap-2 mr-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl font-medium transition-all shadow-lg active:scale-95">
+
+              <button
+                onClick={handleSearch}
+                className="hidden sm:flex items-center gap-2 mr-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl font-medium transition-all shadow-lg active:scale-95"
+              >
                 Search
               </button>
             </div>
@@ -148,19 +181,26 @@ export default function HomePage() {
 
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map(i => (
-              <div key={i} className="h-96 rounded-3xl bg-gray-800/20 border border-white/5 animate-pulse" />
+            {[1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className="h-96 rounded-3xl bg-gray-800/20 border border-white/5 animate-pulse"
+              />
             ))}
           </div>
-        ) : filteredData.length > 0 ? (
+        ) : displayData.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredData.map((item, index) => (
+            {displayData.map((item, index) => (
               <motion.div
                 key={item.userId || item._id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                onClick={() => navigate("/userdetail", { state: { user: item.userId || item._id } })}
+                onClick={() =>
+                  navigate("/userdetail", {
+                    state: { user: item.userId || item._id },
+                  })
+                }
                 className="group relative bg-gray-900/40 backdrop-blur-xl border border-white/10 hover:border-indigo-500/50 rounded-3xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-500/10 hover:-translate-y-1"
               >
                 {/* Cover Gradient */}
@@ -171,15 +211,23 @@ export default function HomePage() {
                   <div className="relative -mt-12 mb-4">
                     <div className="w-24 h-24 rounded-2xl bg-gray-800 p-1 border-4 border-gray-900 shadow-xl overflow-hidden">
                       <img
-                        src={item.image || `https://api.dicebear.com/7.x/initials/svg?seed=${item.name}`}
+                        src={
+                          item.image ||
+                          `https://api.dicebear.com/7.x/initials/svg?seed=${item.name}`
+                        }
                         alt={item.name}
                         className="w-full h-full object-cover rounded-xl"
                       />
                     </div>
                     {item.rating && (
                       <div className="absolute bottom-0 right-0 translate-x-1/4 translate-y-1/4 bg-gray-900 border border-gray-700 rounded-xl px-2 py-1 flex items-center gap-1 shadow-lg">
-                        <span className="text-xs font-bold text-white">{item.rating?.toFixed(1) || "5.0"}</span>
-                        <StarRating rating={item.rating || 5} setRating={() => { }} />
+                        <span className="text-xs font-bold text-white">
+                          {item.rating?.toFixed(1) || "5.0"}
+                        </span>
+                        <StarRating
+                          rating={item.rating || 5}
+                          setRating={() => {}}
+                        />
                       </div>
                     )}
                   </div>
@@ -199,12 +247,16 @@ export default function HomePage() {
                   <div className="space-y-4 mb-6">
                     <div>
                       <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                        <GraduationCap size={12} className="text-indigo-400" /> Can Teach
+                        <GraduationCap size={12} className="text-indigo-400" />{" "}
+                        Can Teach
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {item.canTeach?.slice(0, 3).map((skill, i) => (
-                          <span key={i} className="px-2.5 py-1 rounded-md text-xs font-medium bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
-                            {typeof skill === 'string' ? skill : skill.skill}
+                          <span
+                            key={i}
+                            className="px-2.5 py-1 rounded-md text-xs font-medium bg-indigo-500/10 text-indigo-300 border border-indigo-500/20"
+                          >
+                            {typeof skill === "string" ? skill : skill.skill}
                           </span>
                         ))}
                       </div>
@@ -212,12 +264,16 @@ export default function HomePage() {
 
                     <div>
                       <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                        <BookOpen size={12} className="text-purple-400" /> Wants to Learn
+                        <BookOpen size={12} className="text-purple-400" /> Wants
+                        to Learn
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {item.toLearn?.slice(0, 3).map((skill, i) => (
-                          <span key={i} className="px-2.5 py-1 rounded-md text-xs font-medium bg-purple-500/10 text-purple-300 border border-purple-500/20">
-                            {typeof skill === 'string' ? skill : skill.skill}
+                          <span
+                            key={i}
+                            className="px-2.5 py-1 rounded-md text-xs font-medium bg-purple-500/10 text-purple-300 border border-purple-500/20"
+                          >
+                            {typeof skill === "string" ? skill : skill.skill}
                           </span>
                         ))}
                       </div>
@@ -239,9 +295,12 @@ export default function HomePage() {
             <div className="p-4 rounded-full bg-gray-800 mb-4">
               <UserPlus size={32} className="text-gray-500 opacity-50" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">No recommendations found</h3>
+            <h3 className="text-xl font-bold text-white mb-2">
+              No recommendations found
+            </h3>
             <p className="text-gray-500 max-w-md">
-              We couldn't find any matches right now. Try updating your skills or search for something specific.
+              We couldn't find any matches right now. Try updating your skills
+              or search for something specific.
             </p>
           </div>
         )}

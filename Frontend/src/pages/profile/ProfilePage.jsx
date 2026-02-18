@@ -11,6 +11,8 @@ function ProfilePage() {
       <div className="absolute inset-0 bg-gray-900/90 mix-blend-multiply z-0" />
       <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/50 to-transparent z-0" />
 
+      
+
       {/* Content */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 

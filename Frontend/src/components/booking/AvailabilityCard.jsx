@@ -43,7 +43,7 @@ const allDays = [
   "Sunday",
 ];
 
-function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
+function AvailabilityCard({ closeCard, saveAvailability, initialData, mode }) {
   const transformInitialData = (data) => {
     if (!data || !data.availability) return [];
 
@@ -340,15 +340,7 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
 
   return (
     <div className="w-full">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-white mb-2">
-          Manage Your Time Slots
-        </h2>
-        <p className="text-gray-300 flex items-center justify-center gap-2">
-          <Clock size={16} className="text-[#6C63FF]" />
-          Add and manage your teaching availability
-        </p>
-      </div>
+     
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="space-y-6">
@@ -525,7 +517,7 @@ function AvailabilityCard({ closeCard, saveAvailability, initialData }) {
             disabled={availability.length === 0}
             className="px-8 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-medium rounded-2xl transition-all duration-200 hover:shadow-lg hover:shadow-green-500/25 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none backdrop-blur-lg"
           >
-            Save Schedule
+            {mode === "edit" ? "Update Schedule" : "Save Schedule"}
           </button>
         </div>
       </div>

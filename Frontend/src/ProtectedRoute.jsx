@@ -1,6 +1,6 @@
-import { Navigate } from "react-router-dom";
+import { Navigate,Outlet } from "react-router-dom";
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = () => {
   const token = localStorage.getItem("token");
 
   // If no token → go to login
@@ -9,7 +9,7 @@ const ProtectedRoute = ({ children }) => {
   }
 
   // If token exists → allow access
-  return children;
+  return <Outlet />;
 };
 
 export default ProtectedRoute;

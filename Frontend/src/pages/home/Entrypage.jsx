@@ -1,8 +1,7 @@
 import React from "react";
 import { Outlet, Navigate } from "react-router-dom";
 
-function Entrypage() 
-{
+function Entrypage() {
   const token = localStorage.getItem("token");
   const safeParse = (data) => {
     try {
@@ -17,7 +16,7 @@ function Entrypage()
   const canTeach = safeParse(localStorage.getItem("canTeachPreferences")); // array
 
   console.log("toLearn:", toLearn);
-console.log("canTeach:", canTeach);
+  console.log("canTeach:", canTeach);
 
 
   if (!token) {

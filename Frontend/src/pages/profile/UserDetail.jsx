@@ -11,7 +11,6 @@ import LearnTab from "../../components/skills/LearnTab";
 import ReviewsTab from "../../components/reviews/ReviewsTab";
 import { getSocket } from "../../components/socket/socketService";
 import { toast } from "react-toastify";
-// 1. IMPORT ICONS
 import { X, Send } from "lucide-react";
 
 const UserDetail = () => {
@@ -257,8 +256,8 @@ const UserDetail = () => {
                 <div key={index} className={`flex ${msg.isMe ? "justify-end" : "justify-start"}`}>
                   <div
                     className={`p-4 rounded-2xl text-sm max-w-[85%] border ${msg.isMe
-                        ? "bg-indigo-600 text-white rounded-tr-none border-indigo-500"
-                        : "bg-slate-800 text-slate-200 rounded-tl-none border-slate-700/50"
+                      ? "bg-indigo-600 text-white rounded-tr-none border-indigo-500"
+                      : "bg-slate-800 text-slate-200 rounded-tl-none border-slate-700/50"
                       }`}
                   >
                     <p className="break-words">{msg.message}</p>
