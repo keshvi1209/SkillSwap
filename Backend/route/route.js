@@ -13,6 +13,7 @@ import { getupdateddetails, updatedetails } from "../control/profile/basicDetail
 import { saveAvailability, getAvailability } from "../control/booking/availabilityController.js";
 import {
   createBooking,
+  getBookingHistory,
 } from "../control/booking/bookingController.js";
 import {
   getReceivedRequests,
@@ -52,6 +53,7 @@ router.get("/getusercompletedetails/:id", getusercompletedetails);
 router.post("/saveavailability", saveAvailability);
 router.get("/getavailability/:userId", getAvailability);
 router.post('/bookings', createBooking);
+router.get('/history', getBookingHistory);
 router.get("/teacher/:teacherId", getReceivedRequests);
 router.patch("/:bookingId/status", updateBookingStatus);
 

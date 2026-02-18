@@ -48,7 +48,6 @@ function Login() {
               });
 
               const data = res.data;
-
               if (data.token) {
                 localStorage.setItem("token", data.token);
 
@@ -56,10 +55,18 @@ function Login() {
                 localStorage.setItem("userid", decoded.id);
                 localStorage.setItem("name", decoded.name);
                 localStorage.setItem("email", decoded.email);
-
-                navigate("/");
-              } else {
-                alert("Token not returned from backend");
+                console.log(data.profileIncomplete);
+                if (data.profileIncomplete) {
+                  if (data.missing?.canTeachPreferences) {
+                    navigate("/learn");
+                  } else if (data.missing?.toLearnPreferences) {
+                    navigate("/learn");
+                  } else {
+                    navigate("/"); // fallback safety
+                  }
+                } else {  
+                  navigate("/");
+                }
               }
             } catch (error) {
               console.error("Google login error:", error);
@@ -102,14 +109,24 @@ function Login() {
         localStorage.setItem("userid", decoded.id);
         localStorage.setItem("name", decoded.name);
         localStorage.setItem("email", decoded.email);
-
-        if (rememberMe) {
-          localStorage.setItem("rememberMe", "true");
+        console.log(data.profileIncomplete);
+        if (data.profileIncomplete) {
+          if (data.missing?.canTeachPreferences) {
+            console.log(
+              "Redirecting to /canteach due to missing canTeachPreferences",
+            );
+            navigate("/canteach");
+          } else if (data.missing?.toLearnPreferences) {
+            console.log(
+              "Redirecting to /learn due to missing toLearnPreferences",
+            );
+            navigate("/learn");
+          } else {
+            navigate("/"); // fallback safety
+          }
+        } else {
+          navigate("/");
         }
-
-        navigate("/");
-      } else {
-        alert("Token not found in response");
       }
     } catch (error) {
       if (error.response?.status === 401) {

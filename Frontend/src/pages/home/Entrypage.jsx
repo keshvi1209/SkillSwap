@@ -24,14 +24,6 @@ console.log("canTeach:", canTeach);
     return <Navigate to="/login" replace />;
   }
 
-  if (!toLearn || toLearn.length === 0) {
-    return <Navigate to="/learn" replace />;
-  }
-
-  if (!canTeach || canTeach.length === 0) {
-    return <Navigate to="/teach" replace />;
-  }
-
   return <Outlet />;
 }
 

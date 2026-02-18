@@ -13,7 +13,7 @@ function SkillsEntry() {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
+    <div className="container mx-auto py-6 max-w-4xl relative z-10">
       <div className="bg-gray-900/60 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-white/10">
         {/* Tabs Header */}
         <div className="flex border-b border-white/10 bg-black/20">

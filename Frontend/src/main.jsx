@@ -20,6 +20,7 @@ import RequestDetails from "./components/requests/RequestDetails.jsx";
 import ReceivedRequests from "./components/requests/ReceivedRequests.jsx";
 import AvailabilityPage from "./pages/profile/AvailabilityPage.jsx";
 import ScheduleCalendar from "./components/booking/ScheduleCalendar.jsx";
+import ProtectedRoute from "./ProtectedRoute.jsx";
 import {
   connectSocket,
   disconnectSocket,
@@ -27,6 +28,9 @@ import {
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Chatpage from "./pages/chat/ChatPage.jsx";
+import HistoryPage from "./pages/history/HistoryPage.jsx";
+import NotFound from "./pages/Not-found.jsx";
+import PublicRoute from "./PublicRoute.jsx";
 function AuthInitializer({ children }) {
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
@@ -125,22 +129,29 @@ createRoot(document.getElementById("root")).render(
             style={{ zIndex: 9999 }}
           />
           <Routes>
-            <Route element={<Entrypage />}>
-              <Route path="/" element={<HomePage />} />
+             <Route element={<Entrypage />}>
+                <Route path="/" element={<HomePage />} />
+              </Route>
+            <Route element={<PublicRoute />}>
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/login" element={<Login />} />
             </Route>
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/editcanteach" element={<EditCanteach />} />
-            <Route path="/teach" element={<TeachSkillsPage />} />
-            <Route path="/learn" element={<LearnSkillsPage />} />
-            <Route path="/app" element={<App />} />
-            <Route path="/userdetail" element={<UserDetail />} />
-            <Route path="/RequestDetails/:id" element={<RequestDetails />} />
-            <Route path="/ReceivedRequests" element={<ReceivedRequests />} />
-            <Route path="/availability" element={<AvailabilityPage />} />
-            <Route path="/schedule-calendar" element={<ScheduleCalendar />} />
-            <Route path="/chat" element={<Chatpage />} />
+            <Route element={<ProtectedRoute />}>
+             
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/editcanteach" element={<EditCanteach />} />
+              <Route path="/teach" element={<TeachSkillsPage />} />
+              <Route path="/learn" element={<LearnSkillsPage />} />
+              <Route path="/app" element={<App />} />
+              <Route path="/userdetail" element={<UserDetail />} />
+              <Route path="/RequestDetails/:id" element={<RequestDetails />} />
+              <Route path="/ReceivedRequests" element={<ReceivedRequests />} />
+              <Route path="/availability" element={<AvailabilityPage />} />
+              <Route path="/schedule-calendar" element={<ScheduleCalendar />} />
+              <Route path="/chat" element={<Chatpage />} />
+              <Route path="/sessions" element={<HistoryPage />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthInitializer>
       </AuthProvider>
