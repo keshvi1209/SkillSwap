@@ -17,6 +17,7 @@ const UserDetail = () => {
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState("teach");
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const [feedbacks, setFeedbacks] = useState([]);
 
   // --- CHAT STATES ---
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -34,24 +35,7 @@ const UserDetail = () => {
   const currentUserName = currentUserToken?.name;
   const currentUserEmail = currentUserToken?.email;
 
-  const mockFeedback = [
-    {
-      id: 1,
-      userId: 123,
-      userName: "Alex Johnson",
-      rating: 5,
-      comment: "Excellent teacher! Explained complex concepts in a very understandable way.",
-      date: "2023-10-15",
-    },
-    {
-      id: 2,
-      userId: 124,
-      userName: "Maria Garcia",
-      rating: 4,
-      comment: "Very knowledgeable and patient. Would recommend to others.",
-      date: "2023-09-22",
-    },
-  ];
+
 
   const fetchUserDetails = async (id) => {
     try {
@@ -62,12 +46,25 @@ const UserDetail = () => {
     }
   };
 
+  const fetchFeedbacks = async (id) => {
+    try {
+      const response = await api.get(`/feedback/${id}`);
+      if (response.data.success) {
+        setFeedbacks(response.data.feedbacks);
+      }
+    } catch (error) {
+      console.error("Error fetching feedbacks:", error);
+    }
+  };
+
   useEffect(() => {
     if (userId) {
       fetchUserDetails(userId);
+      fetchFeedbacks(userId);
     } else if (token) {
       const decoded = jwtDecode(token);
       fetchUserDetails(decoded.id);
+      fetchFeedbacks(decoded.id);
     }
   }, [userId, token]);
 
@@ -123,16 +120,16 @@ const UserDetail = () => {
   }, [isChatOpen, user?.email]);
 
 
-  const handleSubmitFeedback = (feedback) => {
-    console.log("Submitting feedback:", feedback);
-    alert("Thank you for your feedback!");
+  const handleSubmitFeedback = (newFeedback) => {
+    setFeedbacks((prev) => [newFeedback, ...prev]);
     setShowFeedbackForm(false);
+    toast.success("Feedback submitted successfully!");
   };
 
   const calculateAverageRating = () => {
-    if (!mockFeedback.length) return 0;
-    const total = mockFeedback.reduce((sum, item) => sum + item.rating, 0);
-    return total / mockFeedback.length;
+    if (!feedbacks.length) return 0;
+    const total = feedbacks.reduce((sum, item) => sum + item.rating, 0);
+    return total / feedbacks.length;
   };
 
   // --- OPEN CHAT UI ---
@@ -185,7 +182,7 @@ const UserDetail = () => {
         <ProfileHeader
           user={user}
           averageRating={calculateAverageRating()}
-          reviewCount={mockFeedback.length}
+          reviewCount={feedbacks.length}
           onMessageClick={handleMessageClick} // Triggers the Drawer
         />
 
@@ -195,7 +192,7 @@ const UserDetail = () => {
             onTabChange={setActiveTab}
             teachCount={user.canTeach ? user.canTeach.length : 0}
             learnCount={user.toLearn ? user.toLearn.length : 0}
-            reviewCount={mockFeedback.length}
+            reviewCount={feedbacks.length}
           />
 
           <div className="p-6 sm:p-8">
@@ -207,10 +204,11 @@ const UserDetail = () => {
             )}
             {activeTab === "reviews" && (
               <ReviewsTab
-                feedbacks={mockFeedback}
+                feedbacks={feedbacks}
                 showFeedbackForm={showFeedbackForm}
                 onToggleFeedbackForm={() => setShowFeedbackForm(!showFeedbackForm)}
                 onSubmitFeedback={handleSubmitFeedback}
+                teacherId={user._id}
               />
             )}
           </div>

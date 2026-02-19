@@ -16,7 +16,7 @@ import HomePage from "./pages/home/HomePage.jsx";
 import App from "./App.jsx";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import UserDetail from "./pages/profile/UserDetail.jsx";
-import RequestDetails from "./components/requests/RequestDetails.jsx";
+import RequestDetails from "./components/requests/RequestDetail.jsx";
 import ReceivedRequests from "./components/requests/ReceivedRequests.jsx";
 import AvailabilityPage from "./pages/profile/AvailabilityPage.jsx";
 import ScheduleCalendar from "./components/booking/ScheduleCalendar.jsx";

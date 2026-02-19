@@ -10,6 +10,7 @@ import authRoutes from "./route/auth.js";
 import meetRoutes from "./route/meet.js";
 
 import chatRoutes from "./route/chat.js";
+import feedbackRoutes from "./route/feedbackRoutes.js";
 import socketHandler from "./socket/socket.js";
 import { createServer } from "http";
 import { Server } from "socket.io";
@@ -83,6 +84,7 @@ app.use("/auth", authRoutes);
 app.use("/", routes);
 app.use("/meet", meetRoutes);
 app.use("/chat", chatRoutes);
+app.use("/feedback", feedbackRoutes);
 
 // --- 5. SOCKET.IO LOGIC ---
 socketHandler(io);

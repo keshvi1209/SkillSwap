@@ -10,7 +10,7 @@ import { setCanTeachPreferences, setToLearnPreferences } from "../control/skills
 import recommendations from "../control/recommendation/recommendationController.js";
 import { getDetails, getusercompletedetails } from "../control/profile/getDetailsController.js";
 import { getupdateddetails, updatedetails } from "../control/profile/basicDetailsController.js";
-import { saveAvailability, getAvailability , updateAvailability } from "../control/booking/availabilityController.js";
+import { saveAvailability, getAvailability, updateAvailability } from "../control/booking/availabilityController.js";
 import {
   createBooking,
   getBookingHistory,
@@ -22,6 +22,7 @@ import {
 import googleAuth from "../control/auth/googleAuth.js";
 import { searchUsers } from "../control/recommendation/searchController.js";
 import meet from "./meet.js";
+
 const router = Router();
 
 const storage = multer.diskStorage({
@@ -59,5 +60,7 @@ router.get('/history', getBookingHistory);
 router.get("/teacher/:teacherId", getReceivedRequests);
 router.patch("/:bookingId/status", updateBookingStatus);
 router.get("/search", searchUsers);
+// Feedback routes moved to feedbackRoutes.js
+
 
 export default router;

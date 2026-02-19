@@ -15,12 +15,12 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   const handleNavigate = () => {
-  if (availabilitySet) {
-    navigate("/availability?mode=edit");
-  } else {
-    navigate("/availability?mode=create");
-  }
-};
+    if (availabilitySet) {
+      navigate("/availability?mode=edit");
+    } else {
+      navigate("/availability?mode=create");
+    }
+  };
 
   useEffect(() => {
     const checkAvailability = async () => {

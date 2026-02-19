@@ -62,9 +62,9 @@ const HistoryPage = () => {
     .sort((a, b) => {
       // Sort upcoming ascending, past descending
       if (filter === "past") {
-        return new Date(b.startTime) - new Date(a.startTime);
+        return new Date(a.startTime) - new Date(b.startTime);
       }
-      return new Date(a.startTime) - new Date(b.startTime);
+      return new Date(b.startTime) - new Date(a.startTime);
     });
 
   const containerVariants = {

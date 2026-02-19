@@ -6,7 +6,9 @@ const ReviewsTab = ({
   feedbacks,
   showFeedbackForm,
   onToggleFeedbackForm,
-  onSubmitFeedback
+  onSubmitFeedback,
+  teacherId,
+  readOnly = false
 }) => {
   return (
     <div>
@@ -15,20 +17,23 @@ const ReviewsTab = ({
           <h3 className="text-2xl font-bold text-white">Student Reviews</h3>
           <p className="text-sm text-gray-400 mt-1">See what students are saying</p>
         </div>
-        <button
-          onClick={onToggleFeedbackForm}
-          className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-lg transition-all font-medium shadow-lg shadow-indigo-500/20 flex items-center gap-2"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-          </svg>
-          Write Review
-        </button>
+        {!readOnly && (
+          <button
+            onClick={onToggleFeedbackForm}
+            className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-lg transition-all font-medium shadow-lg shadow-indigo-500/20 flex items-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            </svg>
+            Write Review
+          </button>
+        )}
       </div>
 
       {showFeedbackForm && (
         <FeedbackForm
-          onSubmit={onSubmitFeedback}
+          teacherId={teacherId}
+          onSuccess={onSubmitFeedback}
           onCancel={onToggleFeedbackForm}
         />
       )}
@@ -53,7 +58,6 @@ const ReviewsTab = ({
             </svg>
           }
           title="No reviews yet"
-          description="Be the first to share your experience!"
         />
       )}
     </div>
