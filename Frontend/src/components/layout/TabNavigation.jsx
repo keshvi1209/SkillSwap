@@ -31,8 +31,8 @@ const TabNavigation = ({ activeTab, onTabChange, teachCount, learnCount, reviewC
               </span>
               <span
                 className={`py-0.5 px-2 rounded-full text-xs font-semibold transition-colors ${isActive
-                    ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/40"
-                    : "bg-gray-800 text-gray-500 border border-white/5"
+                  ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/40"
+                  : "bg-gray-800 text-gray-500 border border-white/5"
                   }`}
               >
                 {tab.count}

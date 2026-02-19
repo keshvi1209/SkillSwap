@@ -77,3 +77,36 @@ export const getAvailability = async (req, res) => {
     });
   }
 };
+
+export const updateAvailability = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { availability } = req.body;
+
+    const updated = await Availability.findOneAndUpdate(
+      { user: userId },
+      { availability },
+      { new: true, runValidators: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({
+        success: false,
+        message: "Availability not found"
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Availability updated successfully",
+      data: updated
+    });
+
+  } catch (error) {
+    console.error("Update availability error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
+  }
+};

@@ -10,7 +10,7 @@ import { setCanTeachPreferences, setToLearnPreferences } from "../control/skills
 import recommendations from "../control/recommendation/recommendationController.js";
 import { getDetails, getusercompletedetails } from "../control/profile/getDetailsController.js";
 import { getupdateddetails, updatedetails } from "../control/profile/basicDetailsController.js";
-import { saveAvailability, getAvailability } from "../control/booking/availabilityController.js";
+import { saveAvailability, getAvailability , updateAvailability } from "../control/booking/availabilityController.js";
 import {
   createBooking,
   getBookingHistory,
@@ -20,6 +20,7 @@ import {
   updateBookingStatus,
 } from "../control/booking/handlebookingrequest.js";
 import googleAuth from "../control/auth/googleAuth.js";
+import { searchUsers } from "../control/recommendation/searchController.js";
 import meet from "./meet.js";
 const router = Router();
 
@@ -52,10 +53,11 @@ router.put("/updatedetails", updatedetails);
 router.get("/getusercompletedetails/:id", getusercompletedetails);
 router.post("/saveavailability", saveAvailability);
 router.get("/getavailability/:userId", getAvailability);
+router.put("/updateavailability/:userId", updateAvailability);
 router.post('/bookings', createBooking);
 router.get('/history', getBookingHistory);
 router.get("/teacher/:teacherId", getReceivedRequests);
 router.patch("/:bookingId/status", updateBookingStatus);
-
+router.get("/search", searchUsers);
 
 export default router;
